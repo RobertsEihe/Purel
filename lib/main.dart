@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -34,6 +35,10 @@ class MapSampleState extends State<MapSample> {
 
   int _polygonIdCounter = 1;
   int _polylineIdCounter = 1;
+
+  String buttonName = 'Click';
+  int currentIndex = 0;
+  bool _isClicked = false;
 
   static final CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962),
@@ -92,72 +97,173 @@ class MapSampleState extends State<MapSample> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: Text('Google Maps'),
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
+      body: Center(
+        child: currentIndex == 0
+            ? Container(
                 child: Column(
                   children: [
-                    TextFormField(
-                      controller: _originController,
-                      decoration: InputDecoration(hintText: ' Origin'),
-                      onChanged: (value) {
-                        print(value);
-                      },
+                    Row(
+                      children: [
+                        /*
+                        Expanded(
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                controller: _originController,
+                                decoration:
+                                    InputDecoration(hintText: ' Origin'),
+                                onChanged: (value) {
+                                  print(value);
+                                },
+                              ),
+                              TextFormField(
+                                controller: _destinationController,
+                                decoration:
+                                    InputDecoration(hintText: ' Destination'),
+                                onChanged: (value) {
+                                  print(value);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () async {
+                            var directions =
+                                await LocationService().getDirections(
+                              _originController.text,
+                              _destinationController.text,
+                            );
+                            _goToPlace(
+                              directions['start_location']['lat'],
+                              directions['start_location']['lng'],
+                              directions['bounds_ne'],
+                              directions['bounds_sw'],
+                            );
+
+                            _setPolyline(directions['polyline_decoded']);
+                          },
+                          icon: Icon(Icons.search),
+                        ),*/
+                      ],
                     ),
-                    TextFormField(
-                      controller: _destinationController,
-                      decoration: InputDecoration(hintText: ' Destination'),
-                      onChanged: (value) {
-                        print(value);
-                      },
+                    Expanded(
+                      child: GoogleMap(
+                        mapType: MapType.normal,
+                        markers: _markers,
+                        polygons: _polygons,
+                        polylines: _polylines,
+                        initialCameraPosition: _kGooglePlex,
+                        onMapCreated: (GoogleMapController controller) {
+                          _controller.complete(controller);
+                        },
+                        /*
+                        onTap: (point) {
+                          setState(() {
+                            polygonLatLngs.add(point);
+                            _setPolygon();
+                          });
+                        },*/
+                      ),
                     ),
                   ],
                 ),
-              ),
-              IconButton(
-                onPressed: () async {
-                  var directions = await LocationService().getDirections(
-                    _originController.text,
-                    _destinationController.text,
-                  );
-                  _goToPlace(
-                    directions['start_location']['lat'],
-                    directions['start_location']['lng'],
-                    directions['bounds_ne'],
-                    directions['bounds_sw'],
-                  );
+              )
+            : currentIndex == 2
+                ? ListView(
+                    children: [
+                      buildAccountOption(context, "Profile"),
+                      /*
+                      // šajos var padot papildus parametru,
+                      // lai identificētu uz kuru lapu jāiet no katra
+                      // no šīm opcijām
+                      */
 
-                  _setPolyline(directions['polyline_decoded']);
-                },
-                icon: Icon(Icons.search),
-              ),
-            ],
+                      buildAccountOption(context, "Payment"),
+                      buildAccountOption(context, "Contacts"),
+                      buildAccountOption(context, "Tutorial"),
+                      /*
+                  ButtonTheme(
+                    // jaieliekt TextButtonTheme jo jaunaķs
+                    minWidth: 200.0,
+                    height: 100.0,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) {
+                              return const SecondPage();
+                            },
+                          ),
+                        );
+                      },
+                      child: Text('Next Page'),
+                    ),
+                  ),*/
+                    ],
+                  )
+                : Container(),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            label: 'Map',
+            icon: Icon(Icons.map),
           ),
-          Expanded(
-            child: GoogleMap(
-              mapType: MapType.normal,
-              markers: _markers,
-              polygons: _polygons,
-              polylines: _polylines,
-              initialCameraPosition: _kGooglePlex,
-              onMapCreated: (GoogleMapController controller) {
-                _controller.complete(controller);
-              },
-              onTap: (point) {
-                setState(() {
-                  polygonLatLngs.add(point);
-                  _setPolygon();
-                });
-              },
-            ),
+          BottomNavigationBarItem(
+            label: 'Charging',
+            icon: Icon(Icons.electric_bolt),
+          ),
+          BottomNavigationBarItem(
+            label: 'Settings',
+            icon: Icon(Icons.settings),
           ),
         ],
+        currentIndex: currentIndex,
+        onTap: (int index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+      ),
+    );
+  }
+
+  // šeit gesture:
+  GestureDetector buildAccountOption(BuildContext context, String title) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (BuildContext context) {
+              return const SecondPage();
+            },
+          ),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[600],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.grey,
+            )
+          ],
+        ),
       ),
     );
   }
@@ -188,5 +294,16 @@ class MapSampleState extends State<MapSample> {
     );
 
     _setMarker(LatLng(lat, lng));
+  }
+}
+
+class SecondPage extends StatelessWidget {
+  const SecondPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(),
+    );
   }
 }

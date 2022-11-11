@@ -2,8 +2,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 
-// tiku 30:24
-
 class LocationService {
   final String key = 'AIzaSyBHiw-x_ns1lKFtvdD31jXwWUdFhpNsulU';
 
