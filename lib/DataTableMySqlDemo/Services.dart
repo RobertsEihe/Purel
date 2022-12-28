@@ -6,11 +6,16 @@ class Services {
   //static const ROOT = 'http://localhost/Employees/roberts.php';
   static const ROOT = 'http://192.168.101.8/roberts.php';
   static const _GET_ALL_ACTION = 'GET_ALL';
+  static const _COUNT_ALL_ACTION = 'COUNT_ALL';
+  static const _GET_LOCATION_ACTION = 'COUNT_ALL';
   static const _GET_USE_ACTION = 'GET_USE';
   static const _ADD_EMP_ACTION = 'ADD_EMP';
   static const _UPDATE_EMP_ACTION = 'UPDATE_EMP';
   static const _UPDATE_USE_ACTION = 'UPDATE_USE';
+  static const _UPDATE_PAYMENT_CARD_ACTION = 'UPDATE_PAYMENT_CARD';
+  static const _UPDATE_DELETE_PAYMENT_CARD_ACTION = 'UPDATE_PAYMENT_CARD';
   static const _DELETE_EMP_ACTION = 'DELETE_EMP';
+  static const _CALC_PRICE_ACTION = 'CALC_PRICE';
 
   // _GET_ALL
 
@@ -20,15 +25,21 @@ class Services {
       map['action'] = _GET_ALL_ACTION;
       final response = await http.post(Uri.parse(ROOT), body: map);
       print('getEmployees REsponse: ${response.body}');
+      print('RESPONSE STATUS CODE: ' + response.statusCode.toString());
       if (200 == response.statusCode) {
+        print('RETURN LIST 1');
         List<Employee> list = parseResponse(response.body);
+        //List<Employee> list = response.body;
+        print('RETURN LIST 2');
         return list;
       } else {
         //return List<Employee>();
+        print('return empty list 1');
         return List.empty();
       }
     } catch (e) {
       //return List<Employee>(); // return empty list on exception/error
+      print('return empty list 2');
       return List.empty();
     }
   }
@@ -36,6 +47,29 @@ class Services {
   static List<Employee> parseResponse(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
     return parsed.map<Employee>((json) => Employee.fromJson(json)).toList();
+  }
+
+  static Future<String> countAll() async {
+    String data;
+    var map = Map<String, dynamic>();
+    map['action'] = _COUNT_ALL_ACTION;
+    var response = await http.post(Uri.parse(ROOT), body: map);
+    data = response.body.toString();
+    //print('useSimple:');
+    //print(response.body);
+    return data;
+  }
+
+  static Future<String> getLocation(String id_no) async {
+    String data;
+    var map = Map<String, dynamic>();
+    map['action'] = _GET_LOCATION_ACTION;
+    map['id_no'] = id_no;
+    var response = await http.post(Uri.parse(ROOT), body: map);
+    data = response.body.toString();
+    //print('useSimple:');
+    //print(response.body);
+    return data;
   }
 
 /* // šis GET_USE atgriež sarakstu
@@ -206,6 +240,54 @@ class Services {
     }
   }
 
+  static Future<String> updatePaymentCard(
+    String id_no,
+    String cardNumber,
+    String cardHolder,
+    String cardMMYY,
+    String cardCVC,
+  ) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _UPDATE_PAYMENT_CARD_ACTION;
+      map['id_no'] = id_no;
+      map['cardNumber'] = cardNumber;
+      map['cardHolder'] = cardHolder;
+      map['cardMMYY'] = cardMMYY;
+      map['cardCVC'] = cardCVC;
+
+      final response = await http.post(Uri.parse(ROOT), body: map);
+      print('updatePayment card Response: ${response.body}');
+      if (200 == response.statusCode) {
+        return response.body;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error"; // return empty list on exception/error
+    }
+  }
+
+  static Future<String> updDeletePaymentCard(
+    String id_no,
+  ) async {
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _UPDATE_PAYMENT_CARD_ACTION;
+      map['id_no'] = id_no;
+
+      final response = await http.post(Uri.parse(ROOT), body: map);
+      print('updatePayment card Response: ${response.body}');
+      if (200 == response.statusCode) {
+        return response.body;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error"; // return empty list on exception/error
+    }
+  }
+
   // Method to delete an Employee in Database..
 
   static Future<String> deleteEmployee(int id_no) async {
@@ -223,5 +305,17 @@ class Services {
     } catch (e) {
       return "error"; // return empty list on exception/error
     }
+  }
+
+  static Future<String> calcPrice(String timeSpent) async {
+    String data;
+    var map = Map<String, dynamic>();
+    map['action'] = _CALC_PRICE_ACTION;
+    map['timeSpent'] = timeSpent;
+    var response = await http.post(Uri.parse(ROOT), body: map);
+    data = response.body.toString();
+    //print('useSimple:');
+    //print(response.body);
+    return data;
   }
 }
