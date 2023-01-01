@@ -8,6 +8,7 @@ class Services {
   static const _GET_ALL_ACTION = 'GET_ALL';
   static const _COUNT_ALL_ACTION = 'COUNT_ALL';
   static const _GET_LOCATION_ACTION = 'COUNT_ALL';
+  static const _GET_ALL_INFO_ACTION = 'GET_ALL_INFO';
   static const _GET_USE_ACTION = 'GET_USE';
   static const _ADD_EMP_ACTION = 'ADD_EMP';
   static const _UPDATE_EMP_ACTION = 'UPDATE_EMP';
@@ -119,6 +120,18 @@ class Services {
   static String parseSingleResponse(String responseBody) {
     final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
     return parsed;
+  }
+
+  static Future<String> getAllInfo(String id_no) async {
+    String data;
+    var map = Map<String, dynamic>();
+    map['action'] = _GET_ALL_INFO_ACTION;
+    map['id_no'] = id_no;
+    var response = await http.post(Uri.parse(ROOT), body: map);
+    data = response.body.toString();
+    //print('useSimple:');
+    //print(response.body);
+    return data;
   }
 
   static Future<String> getUseSimple(String id_no) async {
@@ -307,11 +320,12 @@ class Services {
     }
   }
 
-  static Future<String> calcPrice(String timeSpent) async {
+  static Future<String> calcPrice(String timeSpent, String id_no) async {
     String data;
     var map = Map<String, dynamic>();
     map['action'] = _CALC_PRICE_ACTION;
     map['timeSpent'] = timeSpent;
+    map['id_no'] = id_no;
     var response = await http.post(Uri.parse(ROOT), body: map);
     data = response.body.toString();
     //print('useSimple:');

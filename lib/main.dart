@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+//import 'dart:html';
 //import 'dart:html'; // šitas taisa error
 
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:custom_marker/marker_icon.dart';
 import 'dart:ui' as ui;
 import 'package:custom_info_window/custom_info_window.dart';
+import 'globals.dart' as globals;
 
 import 'DataTableMySqlDemo/DataTableDemo.dart';
 import 'DataTableMySqlDemo/Services.dart';
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Google Maps Demo',
+      debugShowCheckedModeBanner: false,
       home: MapSample(),
     );
   }
@@ -75,10 +78,10 @@ class MapSampleState extends State<MapSample> {
     zoom: 14.4746,
   );
 
-  // static final CameraPosition _rigaLocation = CameraPosition(
-  //   target: LatLng(56.9677, 24.1056),
-  //   zoom: 14.4746,
-  // );
+  static final CameraPosition _rigaLocation = CameraPosition(
+    target: LatLng(56.9677, 24.1056),
+    zoom: 14.4746,
+  );
 
 /*
   static final Marker _kGooglePlexMarker = Marker(
@@ -130,7 +133,6 @@ class MapSampleState extends State<MapSample> {
   // LatLng endLocation1 = LatLng(37.42126133580664, -122.085749655962);
   // LatLng endLocation2 = LatLng(37.42796133123456, -122.085749612345);
 
-  /*
   LatLng RigaLocation1 = LatLng(56.9677, 24.1056);
   LatLng RigaLocation2 = LatLng(56.961931, 24.117156);
   LatLng RigaLocation3 = LatLng(56.960782, 24.123564);
@@ -141,11 +143,10 @@ class MapSampleState extends State<MapSample> {
   LatLng RigaLocation8 = LatLng(56.983907, 24.203974);
   LatLng RigaLocation9 = LatLng(56.953844, 24.256247);
   LatLng RigaLocation10 = LatLng(56.923962, 24.176956);
-*/
 
-  String infTitle = 'Nosaukums';
+  // String infTitle = '100';
   //String infSnip = 'joloberns';
-  String infSnip = 'nosuakums';
+  //String infSnip = 'nosuakums';
 
   tips() {
     String data = 'nekas';
@@ -153,6 +154,21 @@ class MapSampleState extends State<MapSample> {
       data = value;
     });
     return data;
+  }
+
+  // currentIndexFunction(int index) {
+  //   currentIndex = index;
+  // }
+
+  popUpCharging(String infWinTitle) {
+    String dataSnippet = 'nekas';
+    Services.getAllInfo(infWinTitle).then((value) {
+      print('popCharging value: ' + value);
+      dataSnippet = value;
+      showAlertDialog(context, 'pickCharger', '', '', dataSnippet, infWinTitle);
+    });
+
+    //currentIndex = 1;
   }
 
   @override
@@ -163,16 +179,18 @@ class MapSampleState extends State<MapSample> {
     Services.getUseSimple('100').then((value) {
       data = value;
     });
-    // for (var i = 0; i < 3; i++) {
-    //   if (i == 0) {
-    //     addMarkers(endLocation0);
-    //   } else if (i == 1) {
-    //     addMarkers(endLocation1);
-    //   } else if (i == 2) {
-    //     addMarkers(endLocation2);
-    //   }
-    // }
-    addMarkers(endLocation, infTitle);
+
+    //addMarkers(endLocation, '100');
+    addMarkers(RigaLocation1, '100');
+    addMarkers(RigaLocation2, '101');
+    addMarkers(RigaLocation3, '102');
+    addMarkers(RigaLocation4, '103');
+    addMarkers(RigaLocation5, '104');
+    addMarkers(RigaLocation6, '105');
+    addMarkers(RigaLocation7, '106');
+    addMarkers(RigaLocation8, '107');
+    addMarkers(RigaLocation9, '108');
+    addMarkers(RigaLocation10, '109');
     //addMarkers(positionVar, infWinTitle, infWinSnip)
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -218,7 +236,7 @@ class MapSampleState extends State<MapSample> {
         await getBytesFromAsset('assets/images/IconChrg4.png', 120);
 
     String dataSnippet = 'nekas';
-    Services.getUseSimple('100').then((value) {
+    Services.getAllInfo(infWinTitle).then((value) {
       print('value: ' + value);
       dataSnippet = value;
 
@@ -228,30 +246,27 @@ class MapSampleState extends State<MapSample> {
         markerId: MarkerId(positionVar.toString()),
         position: positionVar, //position of marker
 
-        //rotation: -10,
-        infoWindow: InfoWindow(
-          //popup info
-          title: infWinTitle,
-          //snippet: infWinSnip,
-          snippet: dataSnippet,
-          onTap: () {
-            currentIndex = 1;
-          },
-        ),
-        // onTap: () {
-        //   //setState(() {});
-        //   //showAlertDialog(context, 'pickCharger');
-        //   //currentIndex = 1;
-        // },
+        // //rotation: -10,
+        // infoWindow: InfoWindow(
+        //   //popup info
+        //   title: 'Stacija nr. ' + infWinTitle,
+        //   //snippet: infWinSnip,
+        //   snippet: dataSnippet,
+        //   onTap: () {
+        //     currentIndex = 1;
+        //   },
+        // ),
+
+        onTap: () {
+          setState(() {
+            popUpCharging(infWinTitle);
+          });
+        },
 
         //icon: markerbitmap, //Icon for Marker
         icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
       ));
     });
-
-    if (dataSnippet == 'nekas') {
-      dataSnippet = 'kkads murgs';
-    }
 
     // markers.add(Marker(
     //   //add start location marker
@@ -283,210 +298,8 @@ class MapSampleState extends State<MapSample> {
     });
   }
 
-//   addMarkers() async {
-//     BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-//       ImageConfiguration(),
-//       "assets/images/IconChrg4.png",
-//     );
-
-//     Uint8List markerIcon =
-//         await getBytesFromAsset('assets/images/IconChrg4.png', 120);
-
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: startLocation, //position of marker
-//       // infoWindow: InfoWindow(
-//       //   //popup info
-//       //   title: 'Starting Point ',
-//       //   snippet: 'Info texts',
-//       // ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-// /*
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation1, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation2, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation3, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation4, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation5, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation6, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation7, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation8, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation9, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(startLocation.toString()),
-//       position: RigaLocation10, //position of marker
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Riga Point ',
-//         snippet: 'Info texts',
-//       ),
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-// */
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(endLocation.toString()),
-//       position: endLocation, //position of marker
-
-//       //rotation: -10,
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Mezmalas iela 3',
-//         snippet: 'available, 50kw, type2, suns, suns,suns',
-//         onTap: () {
-//           currentIndex = 1;
-//         },
-
-//       ),
-//       // onTap: () {
-//       //   //setState(() {});
-//       //   //showAlertDialog(context, 'pickCharger');
-//       //   //currentIndex = 1;
-//       // },
-
-//       //icon: markerbitmap, //Icon for Marker
-//       icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-//     ));
-
-//     String imgurl = "https://www.fluttercampus.com/img/car.png";
-//     Uint8List bytes = (await NetworkAssetBundle(Uri.parse(imgurl)).load(imgurl))
-//         .buffer
-//         .asUint8List();
-
-//     markers.add(Marker(
-//       //add start location marker
-//       markerId: MarkerId(carLocation.toString()),
-//       position: carLocation, //position of marker
-
-//       infoWindow: InfoWindow(
-//         //popup info
-//         title: 'Car Point ',
-//         snippet: 'Car Marker',
-//       ),
-//       icon: BitmapDescriptor.fromBytes(bytes), //Icon for Marker
-//     ));
-
-//     setState(() {
-//       //refresh UI
-//     });
-//   }
-
   void addTime() {
-    final addSeconds = 1;
+    final addSeconds = 15;
 
     setState(() {
       final seconds = duration.inSeconds + addSeconds;
@@ -495,7 +308,13 @@ class MapSampleState extends State<MapSample> {
   }
 
   void reset() {
+    // noliek taimeri pa nullēm
     setState(() => duration = Duration());
+  }
+
+  countTime() {
+    int timeString;
+    return timeString = duration.inMinutes + 1;
   }
 
   void startTimer() {
@@ -561,26 +380,22 @@ class MapSampleState extends State<MapSample> {
   var dataUse;
   var _dataUse;
   var trisViena;
+  var calcPriceVar;
+  var countTimeVar;
 
-/*
-  _getUse(String id_no) {
-    Services.getUse(id_no).then((use) {
-      setState(() {
-        _dataUse = use;
-      });
-    });
-  }
-*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      //extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: Text('Google Maps'),
+        backgroundColor: Color.fromARGB(255, 166, 59, 185),
+        //backgroundColor:
+        title: Text('purel.'),
       ),
       body:
           //future: BddController().getData();
           Center(
-              child: currentIndex == 0
+              child: globals.currentIndex == 0
                   ? Container(
                       child: Column(
                         children: [
@@ -636,11 +451,11 @@ class MapSampleState extends State<MapSample> {
                               markers: markers,
                               polygons: _polygons,
                               polylines: _polylines,
-                              initialCameraPosition: _kGooglePlex,
-                              //initialCameraPosition: _rigaLocation,
-                              onMapCreated: (GoogleMapController controller) {
-                                _controller.complete(controller);
-                              },
+                              //initialCameraPosition: _kGooglePlex,
+                              initialCameraPosition: _rigaLocation,
+                              // onMapCreated: (GoogleMapController controller) {
+                              //   _controller.complete(controller);
+                              // },
                               /*
                         onTap: (point) {
                           setState(() {
@@ -653,106 +468,231 @@ class MapSampleState extends State<MapSample> {
                         ],
                       ),
                     )
-                  : currentIndex == 1
+                  : globals.currentIndex == 1
                       ? Container(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               buttonIndex == 0
-                                  ? Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
+                                  ? Column(
                                       children: [
-                                        SizedBox(
-                                          height: 68,
-                                          width: 64,
-                                          child: TextFormField(
-                                            onChanged: (value) {
-                                              if (value.length == 1) {
-                                                station_code_n_1 = value;
-                                                print(station_code_n_1);
-                                                FocusScope.of(context)
-                                                    .nextFocus();
-                                              }
-                                            },
-                                            onSaved: (pin1) {
-                                              //station_code_n_1 = pin1;
-                                              //print(station_code_n_1);
-                                            },
-                                            decoration: const InputDecoration(
-                                                hintText: "0"),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6,
-                                            keyboardType: TextInputType.number,
-                                            textAlign: TextAlign.center,
-                                            inputFormatters: [
-                                              LengthLimitingTextInputFormatter(
-                                                  1),
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
-                                            ],
-                                          ),
+                                        Text(
+                                          'Enter station code:',
+                                          style: TextStyle(fontSize: 24),
                                         ),
-                                        SizedBox(
-                                          height: 68,
-                                          width: 64,
-                                          child: TextFormField(
-                                            onChanged: (value) {
-                                              if (value.length == 1) {
-                                                station_code_n_2 = value;
-                                                print(station_code_n_2);
-                                                FocusScope.of(context)
-                                                    .nextFocus();
-                                              }
-                                            },
-                                            onSaved: (pin1) {},
-                                            decoration: const InputDecoration(
-                                                hintText: "0"),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6,
-                                            keyboardType: TextInputType.number,
-                                            textAlign: TextAlign.center,
-                                            inputFormatters: [
-                                              LengthLimitingTextInputFormatter(
-                                                  1),
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
-                                            ],
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 68,
-                                          width: 64,
-                                          child: TextFormField(
-                                            onChanged: (value) {
-                                              if (value.length == 1) {
-                                                station_code_n_3 = value;
-                                                print(station_code_n_3);
-                                                FocusScope.of(context)
-                                                    .nextFocus();
-                                              }
-                                            },
-                                            onSaved: (pin1) {},
-                                            decoration: const InputDecoration(
-                                                hintText: "0"),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .headline6,
-                                            keyboardType: TextInputType.number,
-                                            textAlign: TextAlign.center,
-                                            inputFormatters: [
-                                              LengthLimitingTextInputFormatter(
-                                                  1),
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
-                                            ],
-                                          ),
+                                        Padding(padding: EdgeInsets.all(8.0)),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          children: [
+                                            SizedBox(
+                                              height: 90,
+                                              width: 90,
+                                              child: TextFormField(
+                                                onChanged: (value) {
+                                                  if (value.length == 1) {
+                                                    station_code_n_1 = value;
+                                                    print(station_code_n_1);
+                                                    FocusScope.of(context)
+                                                        .nextFocus();
+                                                  }
+                                                },
+                                                onSaved: (pin1) {
+                                                  //station_code_n_1 = pin1;
+                                                  //print(station_code_n_1);
+                                                },
+                                                decoration: InputDecoration(
+                                                  //hintText: "0",
+                                                  // border: OutlineInputBorder(
+                                                  //     borderSide: BorderSide(
+                                                  //         color: Colors.blue)),
+
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.purpleAccent,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.purple,
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(
+                                                      1),
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly,
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 90,
+                                              width: 90,
+                                              child: TextFormField(
+                                                onChanged: (value) {
+                                                  if (value.length == 1) {
+                                                    station_code_n_2 = value;
+                                                    print(station_code_n_2);
+                                                    FocusScope.of(context)
+                                                        .nextFocus();
+                                                  }
+                                                  if (value.length == 0) {
+                                                    FocusScope.of(context)
+                                                        .previousFocus();
+                                                  }
+                                                },
+                                                onSaved: (pin1) {},
+                                                decoration: InputDecoration(
+                                                  //hintText: "0",
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.purpleAccent,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.purple,
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(
+                                                      1),
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly,
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: 90,
+                                              width: 90,
+                                              //padding: EdgeInsets.all(8),
+                                              // decoration: BoxDecoration(
+                                              //     color: Colors.white,
+                                              //     borderRadius:
+                                              //         BorderRadius.circular(20)),
+                                              child: TextFormField(
+                                                onChanged: (value) {
+                                                  if (value.length == 1) {
+                                                    station_code_n_3 = value;
+                                                    print(station_code_n_3);
+                                                    FocusScope.of(context)
+                                                        .nextFocus();
+                                                  }
+                                                  if (value.length == 0) {
+                                                    FocusScope.of(context)
+                                                        .previousFocus();
+                                                  }
+                                                },
+                                                onSaved: (pin1) {},
+                                                decoration: InputDecoration(
+                                                  //hintText: "0",
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color:
+                                                          Colors.purpleAccent,
+                                                    ),
+                                                  ),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                    borderSide: BorderSide(
+                                                      color: Colors.purple,
+                                                      width: 2.0,
+                                                    ),
+                                                  ),
+                                                ),
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .headline6,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(
+                                                      1),
+                                                  FilteringTextInputFormatter
+                                                      .digitsOnly,
+                                                ],
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     )
+                                  /*
+                                  SizedBox(
+                                      height: 50,
+                                      width: 240,
+                                      child: TextFormField(
+                                        onChanged: (value) {
+                                          if (value.length == 3) {
+                                            //cardNumber = value;
+                                            //print(cardNumber);
+                                            FocusScope.of(context).nextFocus();
+                                          }
+                                          if (value.length == 0) {
+                                            //cardNumber = value;
+                                            //print(cardNumber);
+                                          }
+                                        },
+                                        onSaved: (pin1) {},
+                                        decoration: const InputDecoration(
+                                            hintText: "  Station Code"),
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .headline6,
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.left,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(3),
+                                          FilteringTextInputFormatter
+                                              .digitsOnly,
+                                          new CustomInputFormatterSpaceStationCode(),
+                                        ],
+                                      ),
+                                    )
+                                    */
                                   : Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
@@ -772,46 +712,48 @@ class MapSampleState extends State<MapSample> {
                                     ),
                               ElevatedButton(
                                 style: ButtonStyle(
-                                  foregroundColor:
-                                      MaterialStateProperty.all<Color>(
-                                          Colors.white),
-                                ),
+                                    foregroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Colors.white),
+                                    backgroundColor:
+                                        MaterialStateProperty.all<Color>(
+                                            Color.fromARGB(255, 166, 59, 185))),
                                 onPressed: () {
                                   trisViena = station_code_n_1 +
                                       station_code_n_2 +
                                       station_code_n_3;
+
                                   SharedPrefs().chargingStation = trisViena;
                                   if (trisViena == '000' || trisViena == '0') {
                                     print('trisVienā NO: ' + trisViena);
                                     //DialogExample();
-                                    print('buttonIndex: ' +
-                                        buttonIndex.toString());
-                                    showAlertDialog(context, 'enterCharger');
+
+                                    showAlertDialog(context, 'enterCharger', '',
+                                        '', '', '');
+                                    //showAlertDialog(context, 'enterCharger', countTime().toString(), calcPriceVar.toString());
                                   } else {
                                     print('trisVienā Yes: ' + trisViena);
                                     if (buttonIndex == 0) {
                                       buttonIndex = 1;
                                       Services.getUseSimple(trisViena)
                                           .then((value) {
-                                        if (value == '[{"in_use":"N"}]') {
-                                          print('varam lādēt');
-                                          print('buttonIndex: ' +
-                                              buttonIndex.toString());
+                                        if (value ==
+                                            '[{"in_use":"Available"}]') {
                                           //buttonIndex = 1;
-                                          Services.updateUse(trisViena, 'Y');
+                                          Services.updateUse(
+                                              trisViena, 'Occupied');
                                           SharedPrefs().charging = 'Y';
-                                          //pieliktais
-                                          Services.countAll().then((value) {
-                                            print('countAll: ' + value[18]);
-                                          });
-                                          print('count all functions: ');
-                                          //countAllFunction();
+                                          //reset();
                                         } else {
-                                          print('nevaram lādēt');
-                                          print('buttonIndex: ' +
-                                              buttonIndex.toString());
-                                          showAlertDialog(
-                                              context, 'busyCharger');
+                                          showAlertDialog(context,
+                                              'busyCharger', '', '', '', '');
+
+                                          buttonIndex = 0;
+                                          buttonName = 'Start charging';
+                                          trisViena = '0';
+                                          station_code_n_1 = '0';
+                                          station_code_n_2 = '0';
+                                          station_code_n_3 = '0';
                                         }
                                       });
                                       reset();
@@ -819,26 +761,53 @@ class MapSampleState extends State<MapSample> {
                                       buttonIndex = 0;
                                       Services.getUseSimple(trisViena)
                                           .then((value) {
-                                        if (value == '[{"in_use":"Y"}]') {
-                                          print('varam beigt lādēt');
-                                          print('buttonIndex: ' +
-                                              buttonIndex.toString());
+                                        if (value ==
+                                            '[{"in_use":"Occupied"}]') {
                                           //buttonIndex = 0;
-                                          Services.updateUse(trisViena, 'N');
+                                          Services.updateUse(
+                                              trisViena, 'Available');
                                           //SharedPrefs().charging = 'N';
                                           SharedPrefs().deleteCharging;
                                           SharedPrefs().deleteCharging();
-                                          Services.calcPrice('14')
+                                          // Services.calcPrice(
+                                          //         countTime().toString())
+                                          //     .then((value) {
+                                          //   print('calcPrice: ' + value);
+                                          // });
+
+                                          countTimeVar = countTime().toString();
+
+                                          Services.calcPrice(
+                                                  countTime().toString(),
+                                                  trisViena.toString())
                                               .then((value) {
-                                            print('calcPrice: ' + value);
+                                            calcPriceVar = value;
+                                            print('calcPrice value: ' + value);
+
+                                            showAlertDialog(
+                                                context,
+                                                'finishedCharging',
+                                                countTimeVar,
+                                                calcPriceVar.toString(),
+                                                '',
+                                                '');
+                                            print('count Time in calc price: ' +
+                                                countTime().toString());
                                           });
+
+                                          print('count Time: ');
+                                          print(countTime());
                                           reset();
+                                          trisViena = '0';
+                                          station_code_n_1 = '0';
+                                          station_code_n_2 = '0';
+                                          station_code_n_3 = '0';
                                         } else {
-                                          print('nevaram bigt lādēt');
-                                          Services.calcPrice('14')
-                                              .then((value) {
-                                            print('calcPrice: ' + value);
-                                          });
+                                          print('MySql nevaram bigt lādēt');
+                                          // Services.calcPrice('14')
+                                          //     .then((value) {
+                                          //   print('calcPrice: ' + value);
+                                          // });
                                           SharedPrefs().deleteCharging;
                                           print('buttonIndex: ' +
                                               buttonIndex.toString());
@@ -867,8 +836,8 @@ class MapSampleState extends State<MapSample> {
                             buildAccountOption(context, "Profile", 1),
                             buildAccountOption(context, "Payment", 2),
                             buildAccountOption(context, "Help 24/7", 3),
-                            buildAccountOption(context, "Tutorial", 4),
-                            buildAccountOption(context, "FAQ", 5),
+                            //buildAccountOption(context, "History", 4),
+                            //buildAccountOption(context, "FAQ", 5),
                             /*
                   ButtonTheme(
                     // jaieliekt TextButtonTheme jo jaunaķs
@@ -890,6 +859,7 @@ class MapSampleState extends State<MapSample> {
                           ],
                         )),
       bottomNavigationBar: BottomNavigationBar(
+        fixedColor: Color.fromARGB(255, 166, 59, 185),
         items: const [
           BottomNavigationBarItem(
             label: 'Map',
@@ -904,10 +874,10 @@ class MapSampleState extends State<MapSample> {
             icon: Icon(Icons.settings),
           ),
         ],
-        currentIndex: currentIndex,
+        currentIndex: globals.currentIndex,
         onTap: (int index) {
           setState(() {
-            currentIndex = index;
+            globals.currentIndex = index;
           });
         },
       ),
@@ -942,7 +912,9 @@ class MapSampleState extends State<MapSample> {
           Container(
             padding: EdgeInsets.all(8),
             decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                color: Colors.white,
+                border: Border.all(color: Colors.purple),
+                borderRadius: BorderRadius.circular(20)),
             child: Text(
               time,
               style: TextStyle(
@@ -961,6 +933,7 @@ class MapSampleState extends State<MapSample> {
   GestureDetector buildAccountOption(
       BuildContext context, String title, int pageNext) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
         pageNext == 1
             ? Navigator.of(context).push(
@@ -1006,22 +979,44 @@ class MapSampleState extends State<MapSample> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[600],
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            border: Border.all(width: 2, color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            //crossAxisAlignment: CrossAxisAlignment.center,
+
+            children: [
+              Container(
+                margin: const EdgeInsets.only(left: 20.0, right: 20.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          //color: Colors.grey[600],
+
+                          color: Colors.purple),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.purple,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            )
-          ],
+              // Divider(
+              //   color: Colors.purpleAccent,
+              //   thickness: 2,
+              // )
+            ],
+          ),
         ),
       ),
     );
@@ -1076,43 +1071,8 @@ class SecondPageOne extends StatefulWidget {
 
 class _SecondPageOneState extends State<SecondPageOne> {
   int buttonIndex = 0;
-
-  //String buttonNameLog = 'Save email';
-  String buttonNameSign = 'Sava email';
-
-  String emailSaved = 'roberts.eihe@gmail.com';
-
-  // TextEditingController controller = new TextEditingController();
-  // late SharedPreferences prefs;
-  // String name = "";
-
-  // save() async {
-  //   prefs = await SharedPreferences.getInstance();
-  //   prefs.setString("username", controller.text.toString());
-  // }
-
-  // retrieve() async {
-  //   prefs = await SharedPreferences.getInstance();
-  //   name = prefs.getString("username") ?? '';
-  //   setState(() {});
-  // }
-
-  // delete() async {
-  //   prefs = await SharedPreferences.getInstance();
-  //   prefs.remove("username");
-  //   name = "";
-  //   setState(() {});
-  // }
-
-  // pageStartState(int buttonState) async {
-  //   prefs = await SharedPreferences.getInstance();
-  //   name = prefs.getString("username") ?? '';
-  //   if (name.length > 1) {
-  //     buttonIndex = 1;
-  //   } else {
-  //     buttonIndex = 0;
-  //   }
-  // }
+  String buttonNameSign = 'Save email 0';
+  late String emailSaved = '';
 
   pageStartState(int buttonState) async {
     if (SharedPrefs().username.length > 1) {
@@ -1142,101 +1102,219 @@ class _SecondPageOneState extends State<SecondPageOne> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Page One'),
+        backgroundColor: Color.fromARGB(255, 166, 59, 185),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text('Profile'),
       ),
       body: Center(
         child: Container(
+          alignment: Alignment.topCenter,
           //color: Colors.amber,
           width: 300,
-          child: Column(
-            //mainAxisAlignment: MainAxisAlignment.center,
-            //crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  height: 200,
-                  //color: Colors.deepPurple[200],
-                  child: Icon(
-                    Icons.account_circle,
-                    size: 90,
-                    color: Colors.purple,
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
+              // mainAxisAlignment: MainAxisAlignment.center,
+              // crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    height: 200,
+                    //color: Colors.deepPurple[200],
+                    child: Icon(
+                      Icons.account_circle,
+                      size: 90,
+                      color: Colors.purple,
+                    ),
                   ),
                 ),
-              ),
-              buttonIndex == 0
-                  ? Column(children: [
-                      SizedBox(
-                        height: 50,
-                        width: 250,
-                        child: TextFormField(
-                          //controller: controller,
-
-                          onChanged: (value) {
-                            emailSaved = value;
-                          },
-                          onSaved: (pin1) {},
-                          decoration: const InputDecoration(
-                            hintText: "  email",
-                            border: OutlineInputBorder(),
-                          ),
-                          style: Theme.of(context).textTheme.headline6,
-                          keyboardType: TextInputType.emailAddress,
-                          textAlign: TextAlign.left,
-
-                          //inputFormatters: [
-                          //LengthLimitingTextInputFormatter(19),
-                          //new CustomInputFormatterSpace(),
-                          //],
+                buttonIndex == 0
+                    ? Column(children: [
+                        Text(
+                          'Enter your email:',
+                          style: TextStyle(fontSize: 20),
                         ),
-                      ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                            foregroundColor:
-                                MaterialStateProperty.all<Color>(Colors.white),
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                Color.fromARGB(255, 166, 59, 185))),
-                        onPressed: () async {
-                          if (buttonIndex == 0) {
-                            buttonIndex = 1;
-                            // save();
-                            // await retrieve();
-                            print('SharedPrefs username: ');
-
-                            SharedPrefs().username = emailSaved;
-
-                            print(await SharedPrefs().username);
-                          } else {
-                            buttonIndex = 0;
-                            //delete();
-                          }
-                          setState(() {
-                            if (buttonIndex == 0) {
-                              buttonNameSign = 'Save email';
-                            }
-                            if (buttonIndex == 1) {
-                              buttonNameSign = 'Delete email';
-                            }
-                          });
-                          // print(buttonIndex);
-                        },
-                        child: Text(buttonNameSign),
-                      ),
-                    ])
-                  //   : Text('roberts.eihe'),
-                  : Column(
-                      children: [
+                        Padding(padding: EdgeInsets.all(8.0)),
                         SizedBox(
                           height: 50,
                           width: 250,
-                          child: Text(
-                            //name,
-                            SharedPrefs().username,
+                          child: TextFormField(
+                            //controller: controller,
+
+                            onChanged: (value) {
+                              emailSaved = value;
+                            },
+                            onSaved: (pin1) {},
+                            decoration: const InputDecoration(
+                              hintText: "  email",
+                              border: OutlineInputBorder(),
+                            ),
                             style: Theme.of(context).textTheme.headline6,
+                            keyboardType: TextInputType.emailAddress,
+                            textAlign: TextAlign.left,
+
+                            //inputFormatters: [
+                            //LengthLimitingTextInputFormatter(19),
+                            //new CustomInputFormatterSpace(),
+                            //],
                           ),
                         ),
-                        Row(
-                          children: [
+                        Padding(padding: EdgeInsets.all(8.0)),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Color.fromARGB(255, 166, 59, 185))),
+                          onPressed: () async {
+                            if (buttonIndex == 0) {
+                              //buttonIndex = 1;
+                              // save();
+                              // await retrieve();
+                              print('SharedPrefs username: ');
+
+                              if (emailSaved == '') {
+                                showAlertDialog(
+                                    context, 'enterEmail', '', '', '', '');
+                              } else {
+                                SharedPrefs().username = emailSaved;
+                                // šajā vieta jāieliek e-pasta arī MySql users tabulā
+                              }
+
+                              if (SharedPrefs().username.isNotEmpty &&
+                                  SharedPrefs().username == emailSaved) {
+                                buttonIndex = 1;
+                                print(
+                                    'nomainījām uz: ' + buttonIndex.toString());
+                              }
+
+                              print(await SharedPrefs().username);
+                              // print('SharedPrefs password: ');
+                              // print(await SharedPrefs().password);
+                            } else {
+                              buttonIndex = 0;
+                              //delete();
+                            }
+                            setState(() {});
+                          },
+                          //child: Text(buttonNameSign),
+                          child: Text('Save email'),
+                        ),
+                      ])
+                    : buttonIndex == 1
+                        ? Column(
+                            children: [
+                              SizedBox(
+                                height: 50,
+                                width: 250,
+                                child: Text(
+                                  //name,
+                                  SharedPrefs().username,
+                                  style: Theme.of(context).textTheme.headline6,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                children: [
+                                  ElevatedButton(
+                                    style: ButtonStyle(
+                                        foregroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Colors.white),
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                Color.fromARGB(
+                                                    255, 166, 59, 185))),
+                                    onPressed: () async {
+                                      if (buttonIndex == 1) {
+                                        // jāpārbauda vai nenotiek uzlāde, tad var izdzēst profilu.
+                                        // šajā brīdī jāizdzēš visi dati no users datu bāzes: epasts
+                                        // un tad no sharedprefs jāizdzēš epasts un bankas kartes dati
+                                        if (SharedPrefs().charging !=
+                                            'Y') // šis vēl jāpārbauda
+                                        {
+                                          // izdzēst no datubāzes ierakstus, kur ir šāds epasts kā sharedPrefos
+                                          SharedPrefs().deletePaymentCard;
+                                          SharedPrefs().deleteUsername();
+                                          buttonIndex = 0;
+                                        } else {
+                                          showAlertDialog(
+                                              context,
+                                              'deleteProfileFailed',
+                                              '',
+                                              '',
+                                              '',
+                                              '');
+                                        }
+                                      } else {
+                                        buttonIndex = 1;
+                                        //delete();
+                                      }
+                                      setState(() {});
+                                      // print(buttonIndex);
+                                    },
+                                    //child: Text(buttonNameSign),
+                                    child: Text('Delete email'),
+                                  ),
+                                  OutlinedButton(
+                                    style: ButtonStyle(
+                                      foregroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                        Color.fromARGB(255, 166, 59, 185),
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      buttonIndex = 2;
+                                      setState(
+                                          () {}); // šāds set state ir vajadzīgs, jo liek mainīt lapai stāvokli (uz buttonIndex == 2)
+                                    },
+                                    child: Text('change email'),
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
+                        : Column(children: [
+                            SizedBox(
+                              height: 50,
+                              width: 250,
+                              child: Text(
+                                //name,
+                                SharedPrefs().username,
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.all(8.0)),
+                            SizedBox(
+                              height: 50,
+                              width: 250,
+                              child: TextFormField(
+                                //controller: controller,
+
+                                onChanged: (value) {
+                                  emailSaved = value;
+                                },
+                                onSaved: (pin1) {},
+                                decoration: const InputDecoration(
+                                  hintText: "  new email",
+                                  border: OutlineInputBorder(),
+                                ),
+                                style: Theme.of(context).textTheme.headline6,
+                                keyboardType: TextInputType.emailAddress,
+                                textAlign: TextAlign.left,
+
+                                //inputFormatters: [
+                                //LengthLimitingTextInputFormatter(19),
+                                //new CustomInputFormatterSpace(),
+                                //],
+                              ),
+                            ),
+                            Padding(padding: EdgeInsets.all(8.0)),
                             ElevatedButton(
                               style: ButtonStyle(
                                   foregroundColor:
@@ -1246,60 +1324,37 @@ class _SecondPageOneState extends State<SecondPageOne> {
                                       MaterialStateProperty.all<Color>(
                                           Color.fromARGB(255, 166, 59, 185))),
                               onPressed: () async {
-                                if (buttonIndex == 0) {
-                                  buttonIndex = 1;
-                                  // save();
-                                  // await retrieve();
+                                print('SharedPrefs username: ');
+
+                                if (emailSaved == '') {
+                                  showAlertDialog(
+                                      context, 'enterEmail', '', '', '', '');
+                                } else {
                                   SharedPrefs().username = emailSaved;
-                                  SharedPrefs().username;
-                                  //await UserSimplePreferences().setUsername(emailSaved);
-                                  //await UserSimplePreferences().getUsername().toString();
-                                } else {
-                                  buttonIndex = 0;
-                                  //delete();
+                                  // šajā vieta jāieliek e-pasta arī MySql users tabulā
                                 }
-                                setState(() {
-                                  if (buttonIndex == 0) {
-                                    buttonNameSign = 'Save email';
-                                  }
-                                  if (buttonIndex == 1) {
-                                    buttonNameSign = 'Delete';
-                                  }
-                                });
-                                // print(buttonIndex);
-                              },
-                              child: Text(buttonNameSign),
-                            ),
-                            OutlinedButton(
-                              style: ButtonStyle(
-                                foregroundColor:
-                                    MaterialStateProperty.all<Color>(
-                                  Color.fromARGB(255, 166, 59, 185),
-                                ),
-                              ),
-                              onPressed: () {
-                                if (buttonIndex == 0) {
+
+                                if (SharedPrefs().username.isNotEmpty &&
+                                    SharedPrefs().username == emailSaved) {
                                   buttonIndex = 1;
-                                } else {
-                                  buttonIndex = 0;
+                                  print('nomainījām uz: ' +
+                                      buttonIndex.toString());
                                 }
-                                // setState(() {
-                                //   if (buttonIndex == 0) {
-                                //     buttonNameSign = 'change password';
-                                //   }
-                                //   if (buttonIndex == 1) {
-                                //     buttonNameSign = 'change password';
-                                //   }
-                                // });
-                                // print(buttonIndex);
+
+                                print(await SharedPrefs().username);
+
+                                print(await SharedPrefs().username);
+                                print('SharedPrefs password: ');
+                                print(await SharedPrefs().password);
+
+                                setState(() {});
                               },
-                              child: Text('edit email'),
+                              //child: Text(buttonNameSign),
+                              child: Text('Save email'),
                             ),
-                          ],
-                        )
-                      ],
-                    ),
-            ],
+                          ])
+              ],
+            ),
           ),
         ),
       ),
@@ -1666,73 +1721,117 @@ class SecondPageHelp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Page Help'),
+        backgroundColor: Color.fromARGB(255, 166, 59, 185),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text(
+          'purel. Support',
+        ),
       ),
-      body: Center(
+      body: Container(
+        margin: const EdgeInsets.only(left: 20.0, right: 20.0),
         child: Column(
           children: [
-            Text('24 / 7'),
-            Row(
-              children: [
-                Icon(Icons.call,
-                    size: 50, color: Color.fromARGB(255, 166, 59, 185)),
-                TextButton(
-                  child: Text(
-                    '+371 26828334',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  onPressed: () async {
-                    await launch("tel:+37126828334");
-
-                    // final Uri launchUri = Uri(
-                    //   scheme: 'tel',
-                    //   path: "+37126828334",
-                    // );
-                    // if (await canLaunch(launchUri.toString())) {
-                    //   await launch(launchUri.toString());
-                    // } else {
-                    //   print("the action is not supported. (No Phone app)");
-                    // }
-                  },
-                )
-              ],
+            Padding(padding: EdgeInsets.all(8.0)),
+            Text(
+              '24 / 7',
+              style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple),
             ),
-            Row(
-              children: [
-                Icon(Icons.mail_outlined,
-                    size: 50, color: Color.fromARGB(255, 166, 59, 185)),
-                TextButton(
-                  child: Text(
-                    'roberts.eihe@gmail.com',
-                    style: TextStyle(fontSize: 25),
-                  ),
-                  onPressed: () async {
-                    String email = 'roberts.eihe@gmail.com';
-                    String subject = 'purel Support';
-                    //String body = 'Hit the like button';
+            Text(
+              'Technical support',
+              style: TextStyle(fontSize: 20, color: Colors.purple),
+            ),
+            Padding(padding: EdgeInsets.all(8.0)),
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Container(
+                margin: const EdgeInsets.only(
+                  left: 20.0,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.call,
+                        size: 50, color: Color.fromARGB(255, 166, 59, 185)),
+                    TextButton(
+                      child: Text(
+                        '+371 26828334',
+                        style: TextStyle(fontSize: 25),
+                      ),
+                      onPressed: () async {
+                        await launch("tel:+37126828334");
 
-                    String? encodeQueryParameters(Map<String, String> params) {
-                      return params.entries
-                          .map((MapEntry<String, String> e) =>
-                              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                          .join('&');
-                    }
+                        // final Uri launchUri = Uri(
+                        //   scheme: 'tel',
+                        //   path: "+37126828334",
+                        // );
+                        // if (await canLaunch(launchUri.toString())) {
+                        //   await launch(launchUri.toString());
+                        // } else {
+                        //   print("the action is not supported. (No Phone app)");
+                        // }
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Padding(padding: EdgeInsets.all(8.0)),
+            Container(
+              height: 60,
+              decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: Colors.grey.shade400),
+                  borderRadius: BorderRadius.circular(10)),
+              child: Container(
+                margin: const EdgeInsets.only(
+                  left: 20.0,
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.mail_outlined,
+                        size: 50, color: Color.fromARGB(255, 166, 59, 185)),
+                    TextButton(
+                      child: Text(
+                        'roberts.eihe@gmail.com',
+                        style: TextStyle(fontSize: 23),
+                      ),
+                      onPressed: () async {
+                        String email = 'roberts.eihe@gmail.com';
+                        String subject = 'purel. Support';
+                        //String body = 'Hit the like button';
 
-                    final Uri emailUri = Uri(
-                      scheme: 'mailto',
-                      path: email,
-                      query: encodeQueryParameters(<String, String>{
-                        'subject': subject, /*'body': body*/
-                      }),
-                    );
-                    // if (await canLaunch(emailUri.toString())) {
-                    launch(emailUri.toString());
-                    // } else {
-                    //   print('the action is not supported (No emial app)');
-                    // }
-                  },
-                )
-              ],
+                        String? encodeQueryParameters(
+                            Map<String, String> params) {
+                          return params.entries
+                              .map((MapEntry<String, String> e) =>
+                                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                              .join('&');
+                        }
+
+                        final Uri emailUri = Uri(
+                          scheme: 'mailto',
+                          path: email,
+                          query: encodeQueryParameters(<String, String>{
+                            'subject': subject, /*'body': body*/
+                          }),
+                        );
+                        // if (await canLaunch(emailUri.toString())) {
+                        launch(emailUri.toString());
+                        // } else {
+                        //   print('the action is not supported (No emial app)');
+                        // }
+                      },
+                    )
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -1810,8 +1909,8 @@ class SecondPageFAQ extends StatelessWidget {
   }
 }
 
-showAlertDialog(BuildContext context, String alertCase) {
-  int currentIndex = 0;
+showAlertDialog(BuildContext context, String alertCase, String chargeTime,
+    String chargePrice, String stationInfo, String stationNumber) {
   // Create button
   Widget okButton = TextButton(
     child: Text("OK"),
@@ -1821,18 +1920,19 @@ showAlertDialog(BuildContext context, String alertCase) {
   );
 
   Widget chrgButton = TextButton(
-    child: Text("index = 1"),
+    child: Text(stationInfo),
     onPressed: () {
+      globals.currentIndex = 1;
+      Navigator.of(context).pop();
       //currentIndex = 1;
       //Navigator.of(context).pop();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (BuildContext context) {
-            return SecondPageOne();
-          },
-        ),
-      );
-      ;
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(
+      //     builder: (BuildContext context) {
+      //       return SecondPageOne();
+      //     },
+      //   ),
+      // );
     },
   );
   Widget closeButton = TextButton(
@@ -1867,27 +1967,61 @@ showAlertDialog(BuildContext context, String alertCase) {
     ],
   );
 
+  var tariffVar;
+
+  AlertDialog finishedCharging = AlertDialog(
+    title: Text('Charging finished'),
+    content: Text('Time spent: ' +
+        chargeTime.toString() +
+        ' min' +
+        '\nTariff: 0.15' +
+        ' euro per minute'
+            '\nTotal price: ' +
+        chargePrice.toString() +
+        ' euro'),
+    actions: [
+      okButton,
+    ],
+  );
+
   AlertDialog pickCharger = AlertDialog(
-    title: Text("End point"),
+    title: Text("Stacija nr. " + stationNumber),
     //content: Text("Pick a charger! okay, I will pick"),
     content: SizedBox(
       width: 200,
       height: 200,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Divider(),
-          okButton,
-          Divider(),
-          chrgButton,
-          Divider(),
-          closeButton
-        ],
+        children: [Divider(), chrgButton, Divider(), closeButton],
       ),
     ),
     // actions: [
     //   chrgButton,
     // ],
+  );
+
+  AlertDialog enetrEmail = AlertDialog(
+    title: Text("Warning!"),
+    content: Text("Enter email to be able to save profile"),
+    actions: [
+      okButton,
+    ],
+  );
+
+  AlertDialog enterPassword = AlertDialog(
+    title: Text("Warning!"),
+    content: Text("Enter password to be able to save profile"),
+    actions: [
+      okButton,
+    ],
+  );
+
+  AlertDialog passwordNoMatch = AlertDialog(
+    title: Text("Warning!"),
+    content: Text("Entered passwords have to match."),
+    actions: [
+      okButton,
+    ],
   );
 
   // show the dialog
@@ -1900,6 +2034,14 @@ showAlertDialog(BuildContext context, String alertCase) {
         return enterCharger;
       } else if (alertCase == 'pickCharger') {
         return pickCharger;
+      } else if (alertCase == 'finishedCharging') {
+        return finishedCharging;
+      } else if (alertCase == 'enterEmail') {
+        return enetrEmail;
+      } else if (alertCase == 'enterPassword') {
+        return enterPassword;
+      } else if (alertCase == 'passwordNoMatch') {
+        return passwordNoMatch;
       } else {
         return universalAlert;
       }
@@ -1908,6 +2050,33 @@ showAlertDialog(BuildContext context, String alertCase) {
 }
 
 class CustomInputFormatterSpace extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    var text = newValue.text;
+
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    var buffer = new StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      buffer.write(text[i]);
+      var nonZeroIndex = i + 1;
+      if (nonZeroIndex % 4 == 0 && nonZeroIndex != text.length) {
+        buffer.write(
+            ' '); // Replace this with anything you want to put after each 4 numbers
+      }
+    }
+
+    var string = buffer.toString();
+    return newValue.copyWith(
+        text: string,
+        selection: new TextSelection.collapsed(offset: string.length));
+  }
+}
+
+class CustomInputFormatterSpaceStationCode extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
@@ -1982,6 +2151,18 @@ class SharedPrefs {
 
   deleteUsername() async {
     _sharedPrefs.remove("keyUsername");
+  }
+
+// password
+
+  String get password => _sharedPrefs.getString("keyPassword") ?? "";
+
+  set password(String value) {
+    _sharedPrefs.setString("keyPassword", value);
+  }
+
+  deletePassword() async {
+    _sharedPrefs.remove("keyPassword");
   }
 
 // paymentCard
