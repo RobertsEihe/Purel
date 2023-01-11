@@ -1,60 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
-//import 'dart:html';
-//import 'dart:html'; // šitas taisa error
-
-//import 'package:test/test.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'package:mysql1/mysql1.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:custom_marker/marker_icon.dart';
 import 'dart:ui' as ui;
-import 'package:custom_info_window/custom_info_window.dart';
 import 'globals.dart' as globals;
-
-import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'globals.dart';
 import 'profilePage.dart';
 import 'paymentPage.dart';
 import 'helpPage.dart';
-
-import 'dart:async';
-
-//---------------------------------------
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-
-import 'package:mysql1/mysql1.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:custom_marker/marker_icon.dart';
-import 'dart:ui' as ui;
-import 'package:custom_info_window/custom_info_window.dart';
-import 'globals.dart' as globals;
-import 'profilePage.dart';
-import 'paymentPage.dart';
-import 'helpPage.dart';
 import 'servicesSQL.dart';
-
 import 'locationList.dart';
-
-import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
-//---------------------------------------
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -79,7 +34,6 @@ class MapSample extends StatefulWidget {
 }
 
 class MapSampleState extends State<MapSample> {
-  //String buttonName = 'Start Charging';
   late String buttonName;
   int buttonIndex = 0;
   int currentIndex = 0;
@@ -116,19 +70,21 @@ class MapSampleState extends State<MapSample> {
 
     startTimer();
     resetFrom();
-    //reset();
   }
 
   @override
   Widget build(BuildContext context) {
+    // galvenā ekrāna skata būve notiek šajā Widgetā
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 166, 59, 185),
         title: const Text('purel.'),
       ),
       body: Center(
-          child: globals.currentIndex == 0
+          child: globals.currentIndex ==
+                  0 // izvēlē starp 3 apakšējās navigācijas joslas pogām
               ? Container(
+                  // šajā konteinerī tiek google maps izskats būvēts
                   child: Column(
                     children: [
                       Expanded(
@@ -143,11 +99,13 @@ class MapSampleState extends State<MapSample> {
                 )
               : globals.currentIndex == 1
                   ? Container(
+                      // šajā konteinerī tiek lādēšanas izskats būvēts
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          buttonIndex == 0
+                          buttonIndex ==
+                                  0 // šis indeks regulē kuru lādēšanas ekrānu rādīt atkarībā no nospiestās pogas stāvokļa
                               ? Column(
                                   children: [
                                     const Text(
@@ -159,7 +117,8 @@ class MapSampleState extends State<MapSample> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceAround,
                                       children: [
-                                        stationCodeEntering(context, 1),
+                                        stationCodeEntering(context,
+                                            1), // stacijas numura ievadīšanas funkcija
                                         stationCodeEntering(context, 2),
                                         stationCodeEntering(context, 3),
                                       ],
@@ -173,8 +132,6 @@ class MapSampleState extends State<MapSample> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
-                                        //'Station: $station_code_n_1$station_code_n_2$station_code_n_3',
-
                                         'Stacija: ${trisViena}',
                                         style: const TextStyle(fontSize: 20),
                                       ),
@@ -182,18 +139,21 @@ class MapSampleState extends State<MapSample> {
                                     buildTime(),
                                   ],
                                 ),
-                          chargingStartStopButton(context),
+                          chargingStartStopButton(
+                              context), // lādēšanas ekrāna poga
                         ],
                       ),
                     )
                   : ListView(
                       children: [
-                        buildAccountOption(context, "Profils", 1),
+                        buildAccountOption(context, "Profils",
+                            1), // iestatījumu ekrāna izvēles lapas
                         buildAccountOption(context, "Maksāšana", 2),
                         buildAccountOption(context, "Palīdzība 24/7", 3),
                       ],
                     )),
       bottomNavigationBar: BottomNavigationBar(
+        // apakšējā izvēles josla
         fixedColor: const Color.fromARGB(255, 166, 59, 185),
         items: const [
           BottomNavigationBarItem(
@@ -214,9 +174,6 @@ class MapSampleState extends State<MapSample> {
           setState(() {
             globals.currentIndex = index;
           });
-          // if (index == 1) {
-          //   getGlobalTimer();
-          // }
         },
       ),
     );
@@ -225,6 +182,7 @@ class MapSampleState extends State<MapSample> {
   ///// MAP SCREEN FUNCTIONS /////
 
   static final CameraPosition _rigaLocation = const CameraPosition(
+    // sākuma kameras pozīcija
     target: LatLng(56.9677, 24.1056),
     zoom: 14.4746,
   );
@@ -232,6 +190,7 @@ class MapSampleState extends State<MapSample> {
   Set<Marker> markers = Set(); //markers for google map
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    // mazo uzlādes staciju ikonas iegūšana no pieveinotās bildes
     ByteData data = await rootBundle.load(path);
     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
         targetWidth: width);
@@ -242,18 +201,17 @@ class MapSampleState extends State<MapSample> {
   }
 
   popUpCharging(String infWinTitle) {
+    // uz ikonas uzpiestā reakcija
     String dataSnippet = 'nekas';
     Services.getAllInfo(infWinTitle).then((value) {
-      print('popCharging value: $value');
       dataSnippet = value;
       showAlertDialog(
           context, 'pickCharger', '0', '0', dataSnippet, infWinTitle);
     });
-
-    //currentIndex = 1;
   }
 
   addMarkers(LatLng positionVar, String infWinTitle) async {
+    // funkcija staciju marķieru definēšanai
     BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
       const ImageConfiguration(),
       "assets/images/IconChrg4.png",
@@ -267,7 +225,6 @@ class MapSampleState extends State<MapSample> {
       dataSnippet = value;
 
       markers.add(Marker(
-        //add start location marker
         markerId: MarkerId(positionVar.toString()),
         position: positionVar, //position of marker
 
@@ -287,25 +244,24 @@ class MapSampleState extends State<MapSample> {
   ///// CHARGING SCREEN FUNCTIONS /////
 
   chargingStartStopButton(context) {
+    // uzlādes ekrāna pogas funkcija
     return ElevatedButton(
       style: ButtonStyle(
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           backgroundColor: MaterialStateProperty.all<Color>(
               const Color.fromARGB(255, 166, 59, 185))),
       onPressed: () {
-        //trisViena = station_code_n_1 + station_code_n_2 + station_code_n_3; šei tnoņemt un pielikt pie pogu ievades
-
-        //SharedPrefs().chargingStation = trisViena;
-
         if (trisViena == '000' || trisViena == '0') {
+          // pārbaude uz ievadīto staciju
           showAlertDialog(context, 'enterCharger', '0', '0', '0', '0');
         } else {
           if (buttonIndex == 0) {
-            print('trisViena 3: ' + trisViena);
+            // ja ir ievadīta stacija, tad ja poga ir sākt lādēt stāvoklī
             Services.updateTimerStart(SharedPrefs().username);
             buttonIndex = 1;
 
             Services.getUseSimple(trisViena).then((value) {
+              // pārbaude vai stacija ir brīva
               if (value == '[{"in_use":"Pieejams"}]') {
                 //buttonIndex = 1;
                 if (SharedPrefs().username.isEmpty ||
@@ -315,20 +271,14 @@ class MapSampleState extends State<MapSample> {
                   showAlertDialog(context, 'addCardMail', '0', '0', '0', '0');
                 } else {
                   resetFrom();
-                  print('username: ${SharedPrefs().username}');
-                  //Services.updateTimerStart(SharedPrefs().username);
-
                   Services.updateUse(trisViena, 'Nepieejams');
-
                   SharedPrefs().charging = 'Y';
                   SharedPrefs().chargingStation = trisViena;
                   //buttonIndex = 1;
-
-                  //reset();
-                  //resetFrom();
                 }
               } else {
-                showAlertDialog(context, 'busyCharger', '0', '0', '0', '0');
+                showAlertDialog(context, 'busyCharger', '0', '0', '0',
+                    '0'); // paziņojums, ja ir aizņemta
 
                 buttonIndex = 0;
                 buttonName = 'Sākt uzlādi';
@@ -338,29 +288,27 @@ class MapSampleState extends State<MapSample> {
                 station_code_n_3 = '0';
               }
             });
-
-            //reset();
-            //resetFrom();
           } else {
+            // stāvoklis beigt uzlādi
             buttonIndex = 0;
             Services.getUseSimple(trisViena).then((value) {
               if (value == '[{"in_use":"Nepieejams"}]') {
                 Services.updateUse(trisViena, 'Pieejams');
-
                 SharedPrefs().deleteCharging();
-
                 countTimeVar = countTime().toString();
-
                 Services.calcPrice(countTime().toString(), trisViena)
                     .then((value) {
                   calcPriceVar = value;
 
-                  showAlertDialog(context, 'finishedCharging', countTimeVar,
-                      calcPriceVar.toString(), '0', '0');
+                  showAlertDialog(
+                      context,
+                      'finishedCharging',
+                      countTimeVar,
+                      calcPriceVar.toString(),
+                      '0',
+                      '0'); // izsauc uzlādes pabeigšanas diologu, kas tālāk izsauc cenas aprēķināšanu
                 });
 
-                //reset();
-                //resetFrom();
                 trisViena = '0';
                 station_code_n_1 = '0';
                 station_code_n_2 = '0';
@@ -368,7 +316,6 @@ class MapSampleState extends State<MapSample> {
                 SharedPrefs().deleteChargingStation();
               } else {
                 SharedPrefs().deleteCharging();
-                print('buttonIndex: $buttonIndex');
               }
             });
           }
@@ -388,6 +335,7 @@ class MapSampleState extends State<MapSample> {
   }
 
   stationCodeEntering(context, int position) {
+    // staciajs numura ievadīšanas funkcijas implementācija
     return SizedBox(
       height: 90,
       width: 90,
@@ -396,9 +344,9 @@ class MapSampleState extends State<MapSample> {
           if (value.length == 1) {
             if (position == 1) {
               station_code_n_1 = value;
-              trisViena =
-                  station_code_n_1 + station_code_n_2 + station_code_n_3;
-              //japieleik ka tris viena tiek ierakstits shared prefos un tad to izmantot gan pogā gan displejā
+              trisViena = station_code_n_1 +
+                  station_code_n_2 +
+                  station_code_n_3; // saglabā numuru uz reiz pēc cipara nospiešanas
             } else if (position == 2) {
               station_code_n_2 = value;
               trisViena =
@@ -409,14 +357,14 @@ class MapSampleState extends State<MapSample> {
                   station_code_n_1 + station_code_n_2 + station_code_n_3;
             }
 
-            FocusScope.of(context).nextFocus();
+            FocusScope.of(context)
+                .nextFocus(); // pāriet uz nākamo ciparu, ja ir aizpildīts iepriekšējais
           }
           if (value.length == 0) {
             if (position == 1) {
               station_code_n_1 = value;
               trisViena =
                   station_code_n_1 + station_code_n_2 + station_code_n_3;
-              // japieleik ka tris viena tiek ierakstits shared prefos un tad to izmantot gan pogā gan displejā
             } else if (position == 2) {
               station_code_n_2 = value;
               trisViena =
@@ -427,7 +375,8 @@ class MapSampleState extends State<MapSample> {
                   station_code_n_1 + station_code_n_2 + station_code_n_3;
             }
 
-            FocusScope.of(context).previousFocus();
+            FocusScope.of(context)
+                .previousFocus(); // pāriet uz iepriekšējo ciparu, ja ir izdzēsts cipars
           }
         },
         onSaved: (pin1) {},
@@ -458,10 +407,11 @@ class MapSampleState extends State<MapSample> {
   }
 
   int countTime() {
-    // cik saprotu šo count time var izmest un to get timer sql arī
+    // laika skaitīšanas funkciajs implementācija
     // Laika skaitīšana sākuma punktu paņemot no datubāzes LAIKS_START
 
     Services.getTimer(SharedPrefs().username).then((value) {
+      // funkcija laika iegūšanai no datubāzes
       // pēc lieottājvārda atrod datubāze LAIKS_START vērtību
       int minNum;
       int hourNum;
@@ -488,151 +438,29 @@ class MapSampleState extends State<MapSample> {
       duration = Duration(
           minutes: minNum,
           seconds: secondNum); // šeit iegūtos int ievada kā manuālu laiku
-      //durationGlobal = Duration(minutes: minNum, seconds: secondNum);
     });
 
     int timeString = duration.inMinutes + 1;
-    //int timeString = durationGlobal.inMinutes + 1;
     return timeString; // šeit ir iegūts laiks Int datu tipā, ko var izmantot cenas aprēķināšanai
   }
 
-/*
-  int getTimerSQL(String timeValue) {
-    // timeValue ir strings kurā norāda vai grib iegūt stundas vai minūtes. - "mm" / "hh"
-    int minNum;
-    int hourNum;
-    int secondNum;
-    String minString;
-    String hourString;
-    String secondString;
-    var value;
-
-    // value = await Services.getTimer(SharedPrefs().username);
-    // if (value.length == 22) {
-    //   minString = value.substring(14, 16);
-    //   hourString = value.substring(11, 13);
-    //   secondString = value.substring(17, 19);
-    // } else {
-    //   minString = value.substring(15, 17);
-    //   hourString = value.substring(11, 14);
-    //   secondString = value.substring(18, 20);
-    // }
-
-    // minNum = int.parse(minString);
-
-    // hourNum = int.parse(hourString);
-
-    // secondNum = int.parse(secondString);
-
-    ////------------------------saja vares likt ieksa-
-
-    // Services.getTimer(SharedPrefs().username).then((value) {
-    //   int minNum;
-    //   int hourNum;
-    //   int secondNum;
-    //   String minString;
-    //   String hourString;
-    //   String secondString;
-    //   if (value.length == 22) {
-    //     minString = value.substring(14, 16);
-    //     hourString = value.substring(11, 13);
-    //     secondString = value.substring(17, 19);
-    //   } else {
-    //     minString = value.substring(15, 17);
-    //     hourString = value.substring(11, 14);
-    //     secondString = value.substring(18, 20);
-    //   }
-
-    //   minNum = int.parse(minString);
-    //   hourNum = int.parse(hourString);
-    //   secondNum = int.parse(secondString);
-    //   // šeit varu likt
-    // });
-
-    ///////------------------------saja vares likt ieksa-
-
-    // Services.getTimer(SharedPrefs().username).then((value) {
-    //   if (value.length == 22) {
-    //     minString = value.substring(14, 16);
-    //     hourString = value.substring(11, 13);
-    //     secondString = value.substring(17, 19);
-    //   } else {
-    //     minString = value.substring(15, 17);
-    //     hourString = value.substring(11, 14);
-    //   }
-    // });
-
-    // if (timeValue == 'mm') {
-    //   //print('SQL minutes: ' + int.parse(minString).toString());
-    //   minNum = int.parse(minString);
-    //   //print('SQL min: ' + minNum.toString());
-
-    //   //return minNum;
-    // } else if (timeValue == 'hh') {
-    //   //print('SQL HOURS: ' + int.parse(hourString).toString());
-    //   hourNum = int.parse(hourString);
-    //   //return hourNum;
-    // } else {
-    //   //print('SQL seconds: ' + int.parse(secondString).toString());
-    //   secondNum = int.parse(secondString);
-    //   //return secondNum;
-    // }
-
-    Services.getTimer(SharedPrefs().username).then((value) {
-      print('all SQL: ' + value);
-
-      if (value.length == 22) {
-        minString = value.substring(14, 16);
-        hourString = value.substring(11, 13);
-        secondString = value.substring(17, 19);
-        if (timeValue == 'mm') {
-          print('SQL minutes: ' + int.parse(minString).toString());
-          return minNum = int.parse(minString);
-          //return minNum;
-        } else if (timeValue == 'hh') {
-          print('SQL HOURS: ' + int.parse(hourString).toString());
-          hourNum = int.parse(hourString);
-          //return hourNum;
-        } else {
-          print('SQL seconds: ' + int.parse(secondString).toString());
-          secondNum = int.parse(secondString);
-          //return secondNum;
-        }
-      } else if (value.length == 23) {
-        minString = value.substring(15, 17);
-        hourString = value.substring(11, 14);
-        if (timeValue == 'mm') {
-          return minNum = int.parse(minString);
-        } else {
-          return hourNum = int.parse(hourString);
-        }
-      }
-    });
-    return 0;
-  }
-  */
-
   updateTimerStartSQL() async {
-    await Services.updateTimerStart(SharedPrefs().username);
+    await Services.updateTimerStart(
+        SharedPrefs().username); // datubāzes laika augšupielādēšanas funkcija
   }
 
   void addTime() {
+    // taimera skaitīšanas funkcija
     final addSeconds = 1;
 
     setState(() {
       final secondsSis = duration.inSeconds + addSeconds;
-      //final secondsSis = durationGlobal.inSeconds + addSeconds;
       duration = Duration(seconds: secondsSis);
-      //durationGlobal = Duration(seconds: secondsSis);
     });
   }
 
-  // void reset() {
-  //   // noliek taimeri pa nullēm
-  //   setState(() => duration = const Duration());
-  // }
-
   void resetFrom() async {
+    // taimera uzlikšana uz laiku no datubāzes
     Services.getTimer(SharedPrefs().username).then((value) {
       int minNum;
       int hourNum;
@@ -653,50 +481,20 @@ class MapSampleState extends State<MapSample> {
       minNum = int.parse(minString);
       hourNum = int.parse(hourString);
       secondNum = int.parse(secondString);
-      // šeit varu likt
       duration = Duration(minutes: minNum, seconds: secondNum);
-      //durationGlobal = Duration(minutes: minNum, seconds: secondNum);
       setState(() {
         duration;
-        //durationGlobal;
       });
     });
   }
 
   void startTimer() {
+    // taimera sākšanas funkcija
     timer = Timer.periodic(const Duration(seconds: 1), (_) => addTime());
   }
 
-  // getGlobalTimer() {
-  //   if (SharedPrefs().charging.isNotEmpty) {
-  //     Services.getTimer(SharedPrefs().username).then((value) {
-  //       int minNum;
-  //       int hourNum;
-  //       int secondNum;
-  //       String minString;
-  //       String hourString;
-  //       String secondString;
-  //       //Duration duration;
-  //       if (value.length == 22) {
-  //         minString = value.substring(14, 16);
-  //         hourString = value.substring(11, 13);
-  //         secondString = value.substring(17, 19);
-  //       } else {
-  //         minString = value.substring(15, 17);
-  //         hourString = value.substring(11, 14);
-  //         secondString = value.substring(18, 20);
-  //       }
-
-  //       minNum = int.parse(minString);
-  //       hourNum = int.parse(hourString);
-  //       secondNum = int.parse(secondString);
-
-  //       durationGlobal = Duration(minutes: minNum, seconds: secondNum);
-  //     });
-  //   }
-  // }
-
   pageChargeStartState(int buttonState) async {
+    // lādēšansa lapas sākuma stāvokļa noteikšana - notiek uzlāde vai var ievadīt 3 ciparus
     if (SharedPrefs().charging.isNotEmpty) {
       buttonIndex = 1;
       buttonName = 'Beigt uzlādi';
@@ -708,7 +506,7 @@ class MapSampleState extends State<MapSample> {
         String minString;
         String hourString;
         String secondString;
-        //Duration duration;
+
         if (value.length == 22) {
           minString = value.substring(14, 16);
           hourString = value.substring(11, 13);
@@ -723,7 +521,6 @@ class MapSampleState extends State<MapSample> {
         hourNum = int.parse(hourString);
         secondNum = int.parse(secondString);
 
-        //durationGlobal = Duration(minutes: minNum, seconds: secondNum);
         duration = Duration(minutes: minNum, seconds: secondNum);
       });
       setState(() {});
@@ -735,16 +532,10 @@ class MapSampleState extends State<MapSample> {
   }
 
   Widget buildTime() {
+    // taimera attēlosānas funkcijas implementācija
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     final minutes = twoDigits(duration.inMinutes.remainder(60));
     final seconds = twoDigits(duration.inSeconds.remainder(60));
-    // final minutes = twoDigits(durationGlobal.inMinutes.remainder(60));
-    // final seconds = twoDigits(durationGlobal.inSeconds.remainder(60));
-
-    // return Text(
-    //   '$minutes:$seconds',
-    //   style: TextStyle(fontSize: 50),
-    // );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -782,7 +573,10 @@ class MapSampleState extends State<MapSample> {
   ///// SETTINGS SCREEN FUNCTIONS /////
 
   GestureDetector buildAccountOption(
-      BuildContext context, String title, int pageNext) {
+      // šis 3 izvēles taustiņus padara par skārienjutīgām pogām
+      BuildContext context,
+      String title,
+      int pageNext) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -834,8 +628,6 @@ class MapSampleState extends State<MapSample> {
                       style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
-                          //color: Colors.grey[600],
-
                           color: Colors.purple),
                     ),
                     const Icon(

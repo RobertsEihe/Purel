@@ -18,13 +18,8 @@ class _SecondPageOneState extends State<SecondPageOne> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    print("initState");
-    //pageStartState(buttonIndex);
-    //retrieve();
-    //SharedPrefs().retrieve;
-    //SharedPrefs().username;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       pageStartState(buttonIndex);
     });
@@ -32,6 +27,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
 
   @override
   Widget build(BuildContext context) {
+    // profila lapas būvēšana notiek šajā Widgetā
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 166, 59, 185),
@@ -64,8 +60,10 @@ class _SecondPageOneState extends State<SecondPageOne> {
                     ),
                   ),
                 ),
-                buttonIndex == 0
+                buttonIndex ==
+                        0 // ši ir viena no vietām, kur tiek pārvirzīts ekrāna skats atkarībā no pogas nospiešanas stāvokļa
                     ? Column(children: [
+                        // šis ir skats, kur var ievadīt e-pastu
                         const Text(
                           'Ievadiet e-pastu:',
                           style: TextStyle(fontSize: 20),
@@ -90,16 +88,17 @@ class _SecondPageOneState extends State<SecondPageOne> {
                             keyboardType: TextInputType.emailAddress,
                             textAlign: TextAlign.left,
 
-                            // inputFormatters: [
-                            // LengthLimitingTextInputFormatter(19),
-                            // new CustomInputFormatterSpace(),
-                            // ],
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(
+                                  250), // e-pasta garuma limits
+                            ],
                           ),
                         ),
                         const Padding(padding: EdgeInsets.all(8.0)),
-                        saveEmailFunction(),
+                        saveEmailFunction(), // saglabāt e-pesatu funkcijas izsaukšana
                       ])
-                    : buttonIndex == 1
+                    : buttonIndex ==
+                            1 // ekrāna skats ar nospiestu pogu un saglabātu e-pastu
                         ? Column(
                             children: [
                               SizedBox(
@@ -115,13 +114,14 @@ class _SecondPageOneState extends State<SecondPageOne> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
-                                  deleteProfileFunction(),
+                                  deleteProfileFunction(), // funkciju izsaukumi ekrānā pieejamajām pogām
                                   changeEmailFunction(),
                                 ],
                               )
                             ],
                           )
                         : Column(children: [
+                            // ekrāna skats, ja ir ir uzspiests mainīt e-pastu poga
                             SizedBox(
                               height: 50,
                               width: 250,
@@ -136,8 +136,6 @@ class _SecondPageOneState extends State<SecondPageOne> {
                               height: 50,
                               width: 250,
                               child: TextFormField(
-                                //controller: controller,
-
                                 onChanged: (value) {
                                   emailSaved = value;
                                 },
@@ -149,7 +147,6 @@ class _SecondPageOneState extends State<SecondPageOne> {
                                 style: Theme.of(context).textTheme.headline6,
                                 keyboardType: TextInputType.emailAddress,
                                 textAlign: TextAlign.left,
-
                                 inputFormatters: [
                                   LengthLimitingTextInputFormatter(250),
                                 ],
@@ -169,6 +166,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
   ///// FUNKCIJAS /////
 
   pageStartState(int buttonState) async {
+    // lapas sākuma stāvokļa noteikšana(vai ir pieveinots e-pasts vai nav)
     if (SharedPrefs().username.length > 1) {
       buttonIndex = 1;
       setState(() {});
@@ -179,6 +177,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
   }
 
   saveEmailFunction() {
+    // epasta saglabāšanas funkcijas implementācija
     return ElevatedButton(
       style: ButtonStyle(
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
@@ -186,21 +185,24 @@ class _SecondPageOneState extends State<SecondPageOne> {
               const Color.fromARGB(255, 166, 59, 185))),
       onPressed: () async {
         final bool emailValid = RegExp(
-                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+") // pārbaude vai e-pasts atbilst epasta formai ar RegEx
             .hasMatch(emailSaved);
 
         await Services.getEmail(emailSaved).then((value) {
           emailSQL = value;
         });
         if (emailSQL == '[{"email":"$emailSaved"}]') {
+          // pārbaude vai ievadītais epasts jau neeksistē datubāzē
           showAlertDialog(context, 'emailUsed', '0', '0', '0', '0');
         } else if (!emailValid) {
+          // regex pārbaudes rezultāta izmanotšana
           showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
         } else if (emailSaved == '') {
           showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
         } else {
           // šajā vieta jāieliek e-pasta arī MySql users tabulā
           if (updateEmail) {
+            // ja ir nospiest apoga mainīt epastu, tad šis aktivizējas, a ja nē, tad vienkaŗši pievienojas jauns e-pasts ka inserts
             Services.updateEmail(emailSaved, SharedPrefs().username);
             updateEmail = false;
           } else {
@@ -221,6 +223,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
   }
 
   deleteProfileFunction() {
+    // dzēst profila funkcijas implementācija
     return ElevatedButton(
       style: ButtonStyle(
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
@@ -228,9 +231,10 @@ class _SecondPageOneState extends State<SecondPageOne> {
               const Color.fromARGB(255, 166, 59, 185))),
       onPressed: () async {
         if (buttonIndex == 1) {
-          if (SharedPrefs().charging != 'Y') // šis vēl jāpārbauda
+          if (SharedPrefs().charging !=
+              'Y') // šis pārbauda vai pašlaik nenotiek lādēšana
           {
-            deleteProfileFunctionAlert();
+            deleteProfileFunctionAlert(); // profila dzēšanas paziņojums
           } else {
             showAlertDialog(context, 'deleteProfileFailed', '0', '0', '0', '0');
           }
@@ -244,6 +248,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
   }
 
   deleteProfileFunctionAlert() {
+    // profila dzēšanas paziņojuma implementācija
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -262,10 +267,12 @@ class _SecondPageOneState extends State<SecondPageOne> {
               child: const Text("Dzēst"),
               onPressed: () {
                 Services.deleteEmail(SharedPrefs().username);
-                SharedPrefs().deletePaymentCard();
-                SharedPrefs().deleteUsername();
+                SharedPrefs()
+                    .deletePaymentCard(); // šeit tiek dzēsti maksājumu kartes dati
+                SharedPrefs()
+                    .deleteUsername(); // šeit tiek dzēsts e-pasts. Šo abu dzēšanu kopā es saucu par profila dzēšanu
                 buttonIndex = 0;
-                setState(() {});
+                setState(() {}); // ekrāna atjauninātājs
                 Navigator.of(context).pop();
               },
             ),
@@ -276,6 +283,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
   }
 
   changeEmailFunction() {
+    // e-pasta maiāns funkcijas implementācija
     return OutlinedButton(
       style: ButtonStyle(
         foregroundColor: MaterialStateProperty.all<Color>(

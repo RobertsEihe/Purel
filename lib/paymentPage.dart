@@ -9,12 +9,10 @@ class SecondPageTwo extends StatefulWidget {
 }
 
 class _SecondPageTwoState extends State<SecondPageTwo> {
-  // const SecondPageTwo({super.key});
   var cardNumber = '';
   late String cardHolder;
   var cardMMYY = '';
   var cardCVC = '';
-  //String buttonName = 'Save card';
   int buttonIndex = 0;
   late String mask;
 
@@ -50,9 +48,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    print("initState");
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       pageStartState(buttonIndex);
@@ -234,12 +230,10 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
         onChanged: (value) {
           if (value.length == 19) {
             cardNumber = value;
-            print(cardNumber);
             FocusScope.of(context).nextFocus();
           }
           if (value.length == 0) {
             cardNumber = value;
-            print(cardNumber);
           }
         },
         onSaved: (pin1) {},
@@ -275,7 +269,6 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
       child: TextFormField(
         onChanged: (value) {
           cardHolder = value;
-          print(cardHolder);
         },
         //onSaved: (pin1) {},
         decoration: const InputDecoration(
@@ -309,12 +302,10 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
         onChanged: (value) {
           if (value.length == 5) {
             cardMMYY = value;
-            print(cardMMYY);
             FocusScope.of(context).nextFocus();
           }
           if (value.length == 0) {
             cardMMYY = value;
-            print(cardMMYY);
             FocusScope.of(context).previousFocus();
           }
         },
@@ -352,12 +343,10 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
         onChanged: (value) {
           if (value.length == 3) {
             cardCVC = value;
-            print(cardCVC);
             FocusScope.of(context).nextFocus();
           }
           if (value.length == 0) {
             cardCVC = value;
-            print(cardCVC);
             FocusScope.of(context).previousFocus();
           }
         },

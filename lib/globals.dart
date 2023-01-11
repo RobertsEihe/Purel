@@ -7,7 +7,6 @@ import 'profilePage.dart';
 //////  GLOBĀLI MAINĪGIE  //////
 
 int currentIndex = 0;
-//late Duration durationGlobal;
 
 //////  GLOBĀLAS FUNKCIJAS  //////
 
@@ -16,18 +15,14 @@ int currentIndex = 0;
 class SharedPrefs {
   static SharedPreferences _sharedPrefs =
       SharedPreferences.getInstance() as SharedPreferences;
-
   factory SharedPrefs() => SharedPrefs._internal();
-
   SharedPrefs._internal();
-
   Future<void> init() async {
     _sharedPrefs = await SharedPreferences.getInstance();
   }
+
 // username/email
-
   String get username => _sharedPrefs.getString("keyUsername") ?? "";
-
   set username(String value) {
     _sharedPrefs.setString("keyUsername", value);
   }
@@ -37,9 +32,7 @@ class SharedPrefs {
   }
 
 // password
-
   String get password => _sharedPrefs.getString("keyPassword") ?? "";
-
   set password(String value) {
     _sharedPrefs.setString("keyPassword", value);
   }
@@ -49,9 +42,7 @@ class SharedPrefs {
   }
 
 // paymentCard
-
   String get paymentCard => _sharedPrefs.getString("keyPayment") ?? "";
-
   set paymentCard(String value) {
     _sharedPrefs.setString("keyPayment", value);
   }
@@ -61,9 +52,7 @@ class SharedPrefs {
   }
 
   // charging
-
   String get charging => _sharedPrefs.getString("keyCharging") ?? "";
-
   set charging(String value) {
     _sharedPrefs.setString("keyCharging", value);
   }
@@ -72,12 +61,10 @@ class SharedPrefs {
     _sharedPrefs.remove("keyCharging");
   }
 
-  // station code, savādāk, kad atgriežas tas domā, ir taimera režīms,
-  // bet staion: 000 un ar pogu nekur nevar tikt
+// charging station number
 
   String get chargingStation =>
       _sharedPrefs.getString("keyChargingStation") ?? "";
-
   set chargingStation(String value) {
     _sharedPrefs.setString("keyChargingStation", value);
   }
@@ -159,64 +146,6 @@ showAlertDialog(BuildContext context, String alertCase, String chargeTime,
       okButton,
     ],
   );
-/*
- Services.getTimer(SharedPrefs().username).then((value) {
-    int minNum;
-    int hourNum;
-    int secondNum;
-    String minString;
-    String hourString;
-    String secondString;
-    Duration duration;
-    if (value.length == 22) {
-      minString = value.substring(14, 16);
-      hourString = value.substring(11, 13);
-      secondString = value.substring(17, 19);
-    } else {
-      minString = value.substring(15, 17);
-      hourString = value.substring(11, 14);
-      secondString = value.substring(18, 20);
-    }
-
-    minNum = int.parse(minString);
-    hourNum = int.parse(hourString);
-    secondNum = int.parse(secondString);
-    // šeit varu likt
-    duration = Duration(minutes: minNum, seconds: secondNum);
-    //duration = Duration(minutes: 3, seconds: 1);
-    print('DURATION 1.1: ' + duration.toString());
-
-    int chargeTimeInt = duration.inMinutes;
-    late num wholeHours;
-    late num wholeMinutes;
-
-    print('lidz sejienei vispar atnak');
-
-    if (chargeTimeInt >= 60) {
-      wholeHours = (chargeTimeInt / 60).floor();
-      wholeMinutes = chargeTimeInt - (60 * wholeHours);
-      
-          AlertDialog finishedCharging = AlertDialog(
-    title: const Text('Uzlāde pabeigta'),
-    content: Text(
-          'Iztērētais laiks: $wholeHours h $wholeMinutes min\nTarifs: 0.15 eiro minūtē\nKopā cena: $chargePrice eiro'),
-    actions: [
-      okButton,
-    ],
-  );
-    } else {
-      
-          AlertDialog finishedCharging = AlertDialog(
-    title: const Text('Uzlāde pabeigta'),
-    content: Text(
-          'Iztērētais laiks: $chargeTimeInt min\nTarifs: 0.15 eiro minūtē\nKopējā cena: $chargePrice eiro'),
-    actions: [
-      okButton,
-    ],
-  );
-    }
-  });
-  */
 
   AlertDialog pickCharger = AlertDialog(
     title: Text("Stacija nr. " + stationNumber),
@@ -260,22 +189,6 @@ showAlertDialog(BuildContext context, String alertCase, String chargeTime,
       okButton,
     ],
   );
-
-  // AlertDialog enterPassword = AlertDialog( // šo var dzēst ārā
-  //   title: const Text("Warning!"),
-  //   content: const Text("Enter password to be able to save profile"),
-  //   actions: [
-  //     okButton,
-  //   ],
-  // );
-
-  // AlertDialog passwordNoMatch = AlertDialog(
-  //   title: const Text("Warning!"),
-  //   content: const Text("Entered passwords have to match."),
-  //   actions: [
-  //     okButton,
-  //   ],
-  // );
 
   AlertDialog incorrectCardNum = AlertDialog(
     title: const Text("Uzmanību!"),
@@ -347,14 +260,8 @@ showAlertDialog(BuildContext context, String alertCase, String chargeTime,
 Text displaySpentTimeAndMoney(String chargeTimeString, String chargePrice) {
   int chargeTimeInt = int.parse(chargeTimeString);
 
-  //print('DURATION S.1: ' + chargeTimeInt.toString());
-
-  //int chargeTimeInt = durationGlobal.inMinutes;
-  //chargeTimeInt = chargeTimeInt + 1;
   late num wholeHours;
   late num wholeMinutes;
-
-  //print('lidz sejienei vispar atnak');
 
   if (chargeTimeInt >= 60) {
     wholeHours = (chargeTimeInt / 60).floor();
@@ -366,96 +273,6 @@ Text displaySpentTimeAndMoney(String chargeTimeString, String chargePrice) {
         'Iztērētais laiks: $chargeTimeInt min\nTarifs: 0.15 eiro minūtē\nKopējā cena: $chargePrice eiro');
   }
 }
-
-//--------------------------------------
-
-// Text displaySpentTimeAndMoney(String chargeTime, String chargePrice) {
-//   //int chargeTimeInt = int.parse(chargeTimeString);
-
-//   print('DURATION 1.1: ' + durationGlobal.toString());
-
-//   int chargeTimeInt = durationGlobal.inMinutes;
-//   chargeTimeInt = chargeTimeInt + 1;
-//   late num wholeHours;
-//   late num wholeMinutes;
-
-//   print('lidz sejienei vispar atnak');
-
-//   if (chargeTimeInt >= 60) {
-//     wholeHours = (chargeTimeInt / 60).floor();
-//     wholeMinutes = chargeTimeInt - (60 * wholeHours);
-//     return Text(
-//         'Iztērētais laiks: $wholeHours h $wholeMinutes min\nTarifs: 0.15 eiro minūtē\nKopā cena: $chargePrice eiro');
-//   } else {
-//     return Text(
-//         'Iztērētais laiks: $chargeTimeInt min\nTarifs: 0.15 eiro minūtē\nKopējā cena: $chargePrice eiro');
-//   }
-// }
-
-/*
-Text displaySpentTimeAndMoney(String chargeTime, String chargePrice) {
-  //int chargeTimeInt = int.parse(chargeTimeString);
-
-  Services.getTimer(SharedPrefs().username).then((value) {
-    int minNum;
-    int hourNum;
-    int secondNum;
-    String minString;
-    String hourString;
-    String secondString;
-    Duration duration;
-    if (value.length == 22) {
-      minString = value.substring(14, 16);
-      hourString = value.substring(11, 13);
-      secondString = value.substring(17, 19);
-    } else {
-      minString = value.substring(15, 17);
-      hourString = value.substring(11, 14);
-      secondString = value.substring(18, 20);
-    }
-
-    minNum = int.parse(minString);
-    hourNum = int.parse(hourString);
-    secondNum = int.parse(secondString);
-    // šeit varu likt
-    duration = Duration(minutes: minNum, seconds: secondNum);
-    //duration = Duration(minutes: 3, seconds: 1);
-    print('DURATION 1.1: ' + duration.toString());
-
-    int chargeTimeInt = duration.inMinutes;
-    late num wholeHours;
-    late num wholeMinutes;
-
-    print('lidz sejienei vispar atnak');
-
-    if (chargeTimeInt >= 60) {
-      wholeHours = (chargeTimeInt / 60).floor();
-      wholeMinutes = chargeTimeInt - (60 * wholeHours);
-      return Text(
-          'Iztērētais laiks: $wholeHours h $wholeMinutes min\nTarifs: 0.15 eiro minūtē\nKopā cena: $chargePrice eiro');
-    } else {
-      return Text(
-          'Iztērētais laiks: $chargeTimeInt min\nTarifs: 0.15 eiro minūtē\nKopējā cena: $chargePrice eiro');
-    }
-  });
-
-  return Text('šis return atgreiza :(');
-
-  // int chargeTimeInt = duration;
-  // late num wholeHours;
-  // late num wholeMinutes;
-
-  // if (chargeTimeInt >= 60) {
-  //   wholeHours = (chargeTimeInt / 60).floor();
-  //   wholeMinutes = chargeTimeInt - (60 * wholeHours);
-  //   return Text(
-  //       'Time spent: $wholeHours h $wholeMinutes min\nTariff: 0.15 euro per minute\nTotal price: $chargePrice euro');
-  // } else {
-  //   return Text(
-  //       'Time spent: $chargeTimeInt min\nTariff: 0.15 euro per minute\nTotal price: $chargePrice euro');
-  // }
-}
-*/
 
 class CustomInputFormatterSpace extends TextInputFormatter {
   @override
@@ -472,8 +289,7 @@ class CustomInputFormatterSpace extends TextInputFormatter {
       buffer.write(text[i]);
       var nonZeroIndex = i + 1;
       if (nonZeroIndex % 4 == 0 && nonZeroIndex != text.length) {
-        buffer.write(
-            ' '); // Replace this with anything you want to put after each 4 numbers
+        buffer.write(' ');
       }
     }
 
@@ -499,8 +315,7 @@ class CustomInputFormatterSlash extends TextInputFormatter {
       buffer.write(text[i]);
       var nonZeroIndex = i + 1;
       if (nonZeroIndex % 2 == 0 && nonZeroIndex != text.length) {
-        buffer.write(
-            '/'); // Replace this with anything you want to put after each 4 numbers
+        buffer.write('/');
       }
     }
 

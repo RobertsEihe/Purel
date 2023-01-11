@@ -89,16 +89,6 @@ class SecondPageHelp extends StatelessWidget {
       ),
       onPressed: () async {
         await launch("tel:+37126828334");
-
-        // final Uri launchUri = Uri(
-        //   scheme: 'tel',
-        //   path: "+37126828334",
-        // );
-        // if (await canLaunch(launchUri.toString())) {
-        //   await launch(launchUri.toString());
-        // } else {
-        //   print("the action is not supported. (No Phone app)");
-        // }
       },
     );
   }
@@ -124,15 +114,10 @@ class SecondPageHelp extends StatelessWidget {
           scheme: 'mailto',
           path: email,
           query: encodeQueryParameters(<String, String>{
-            'subject': subject, /*'body': body*/
+            'subject': subject,
           }),
         );
-        // if (await canLaunch(emailUri.toString())) {
-        //launch(emailUri.toString());
         launchUrl(emailUri);
-        // } else {
-        //   print('the action is not supported (No emial app)');
-        // }
       },
     );
   }
