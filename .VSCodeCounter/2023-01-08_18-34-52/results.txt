@@ -1,0 +1,32 @@
+Date : 2023-01-08 18:34:52
+Directory : c:\Users\rober\flutter_projects\untitled4\lib
+Total : 8 files,  2169 codes, 342 comments, 278 blanks, all 2789 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| Dart     |          8 |      2,169 |        342 |        278 |      2,789 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                            | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                               |          8 |      2,169 |        342 |        278 |      2,789 |
++-----------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                        | language | code       | comment    | blank      | total      |
++-----------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\rober\flutter_projects\untitled4\lib\count.dart        | Dart     |        244 |         48 |         52 |        344 |
+| c:\Users\rober\flutter_projects\untitled4\lib\globals.dart      | Dart     |        309 |         39 |         62 |        410 |
+| c:\Users\rober\flutter_projects\untitled4\lib\helpPage.dart     | Dart     |        116 |         15 |          9 |        140 |
+| c:\Users\rober\flutter_projects\untitled4\lib\locationList.dart | Dart     |         11 |          0 |          2 |         13 |
+| c:\Users\rober\flutter_projects\untitled4\lib\main.dart         | Dart     |        566 |        111 |         82 |        759 |
+| c:\Users\rober\flutter_projects\untitled4\lib\paymentPage.dart  | Dart     |        356 |          7 |         21 |        384 |
+| c:\Users\rober\flutter_projects\untitled4\lib\profilePage.dart  | Dart     |        257 |         19 |         19 |        295 |
+| c:\Users\rober\flutter_projects\untitled4\lib\servicesSQL.dart  | Dart     |        310 |        103 |         31 |        444 |
+| Total                                                           |          |      2,169 |        342 |        278 |      2,789 |
++-----------------------------------------------------------------+----------+------------+------------+------------+------------+
