@@ -1,3 +1,5 @@
+//import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'globals.dart';
@@ -188,35 +190,63 @@ class _SecondPageOneState extends State<SecondPageOne> {
                 r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+") // pārbaude vai e-pasts atbilst epasta formai ar RegEx
             .hasMatch(emailSaved);
 
+        loadingAplis(context);
+
         await Services.getEmail(emailSaved).then((value) {
+          print('value' + value);
           emailSQL = value;
         });
-        if (emailSQL == '[{"email":"$emailSaved"}]') {
-          // pārbaude vai ievadītais epasts jau neeksistē datubāzē
-          showAlertDialog(context, 'emailUsed', '0', '0', '0', '0');
-        } else if (!emailValid) {
-          // regex pārbaudes rezultāta izmanotšana
-          showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
-        } else if (emailSaved == '') {
-          showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
+        Navigator.of(context).pop();
+        if (emailSQL == "error") {
+          showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
         } else {
-          // šajā vieta jāieliek e-pasta arī MySql users tabulā
-          if (updateEmail) {
-            // ja ir nospiest apoga mainīt epastu, tad šis aktivizējas, a ja nē, tad vienkaŗši pievienojas jauns e-pasts ka inserts
-            Services.updateEmail(emailSaved, SharedPrefs().username);
-            updateEmail = false;
+          if (emailSQL == '[{"email":"$emailSaved"}]') {
+            // pārbaude vai ievadītais epasts jau neeksistē datubāzē
+            showAlertDialog(context, 'emailUsed', '0', '0', '0', '0');
+          } else if (!emailValid) {
+            // regex pārbaudes rezultāta izmanotšana
+            showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
+          } else if (emailSaved == '') {
+            showAlertDialog(context, 'enterEmail', '0', '0', '0', '0');
           } else {
-            Services.addEmail(emailSaved);
+            // šajā vieta jāieliek e-pasta arī MySql users tabulā
+            if (updateEmail) {
+              // ja ir nospiest apoga mainīt epastu, tad šis aktivizējas, a ja nē, tad vienkaŗši pievienojas jauns e-pasts ka inserts
+              loadingAplis(context);
+
+              await Services.updateEmail(emailSaved, SharedPrefs().username)
+                  .then((value) {
+                if (value == "error") {
+                  Navigator.of(context).pop();
+                  showAlertDialog(
+                      context, 'universalAlert', '0', '0', '0', '0');
+                } else {
+                  Navigator.of(context).pop();
+                }
+              });
+              updateEmail = false;
+            } else {
+              loadingAplis(context);
+              await Services.addEmail(emailSaved).then((value) {
+                if (value == "error") {
+                  Navigator.of(context).pop();
+                  showAlertDialog(
+                      context, 'universalAlert', '0', '0', '0', '0');
+                } else {
+                  Navigator.of(context).pop();
+                }
+              });
+            }
+            SharedPrefs().username = emailSaved;
           }
-          SharedPrefs().username = emailSaved;
-        }
 
-        if (SharedPrefs().username.isNotEmpty &&
-            SharedPrefs().username == emailSaved) {
-          buttonIndex = 1;
-        }
+          if (SharedPrefs().username.isNotEmpty &&
+              SharedPrefs().username == emailSaved) {
+            buttonIndex = 1;
+          }
 
-        setState(() {});
+          setState(() {});
+        }
       },
       child: const Text('Saglabāt e-pastu'),
     );
@@ -234,7 +264,7 @@ class _SecondPageOneState extends State<SecondPageOne> {
           if (SharedPrefs().charging !=
               'Y') // šis pārbauda vai pašlaik nenotiek lādēšana
           {
-            deleteProfileFunctionAlert(); // profila dzēšanas paziņojums
+            await deleteProfileFunctionAlert(); // profila dzēšanas paziņojums
           } else {
             showAlertDialog(context, 'deleteProfileFailed', '0', '0', '0', '0');
           }
@@ -265,15 +295,25 @@ class _SecondPageOneState extends State<SecondPageOne> {
             ),
             TextButton(
               child: const Text("Dzēst"),
-              onPressed: () {
-                Services.deleteEmail(SharedPrefs().username);
-                SharedPrefs()
-                    .deletePaymentCard(); // šeit tiek dzēsti maksājumu kartes dati
-                SharedPrefs()
-                    .deleteUsername(); // šeit tiek dzēsts e-pasts. Šo abu dzēšanu kopā es saucu par profila dzēšanu
-                buttonIndex = 0;
-                setState(() {}); // ekrāna atjauninātājs
-                Navigator.of(context).pop();
+              onPressed: () async {
+                loadingAplis(context);
+                await Services.deleteEmail(SharedPrefs().username)
+                    .then((value) {
+                  if (value == "error") {
+                    Navigator.of(context).pop();
+                    showAlertDialog(
+                        context, 'universalAlert', '0', '0', '0', '0');
+                  } else {
+                    Navigator.of(context).pop();
+                    SharedPrefs()
+                        .deletePaymentCard(); // šeit tiek dzēsti maksājumu kartes dati
+                    SharedPrefs()
+                        .deleteUsername(); // šeit tiek dzēsts e-pasts. Šo abu dzēšanu kopā es saucu par profila dzēšanu
+                    buttonIndex = 0;
+                    setState(() {}); // ekrāna atjauninātājs
+                    Navigator.of(context).pop();
+                  }
+                });
               },
             ),
           ],

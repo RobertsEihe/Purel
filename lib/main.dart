@@ -50,7 +50,7 @@ class MapSampleState extends State<MapSample> {
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); // ekrāna stāvokļa mainīšanas funkcija
 
     addMarkers(RigaLocation1, '100');
     addMarkers(RigaLocation2, '101');
@@ -64,6 +64,7 @@ class MapSampleState extends State<MapSample> {
     addMarkers(RigaLocation10, '109');
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // funkcija pēc programmas palaišanas telefonā, lai atsauc šo un uzliek lādēšaas ekrāna stāvokli
       pageChargeStartState(buttonIndex);
       //SharedPrefs().deleteCharging();
     });
@@ -200,13 +201,20 @@ class MapSampleState extends State<MapSample> {
         .asUint8List();
   }
 
-  popUpCharging(String infWinTitle) {
+  popUpCharging(String infWinTitle) async {
     // uz ikonas uzpiestā reakcija
     String dataSnippet = 'nekas';
-    Services.getAllInfo(infWinTitle).then((value) {
+    loadingAplis(context);
+    await Services.getAllInfo(infWinTitle).then((value) {
       dataSnippet = value;
-      showAlertDialog(
-          context, 'pickCharger', '0', '0', dataSnippet, infWinTitle);
+      if (value == "error") {
+        Navigator.of(context).pop();
+        showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
+      } else {
+        Navigator.of(context).pop();
+        showAlertDialog(
+            context, 'pickCharger', '0', '0', dataSnippet, infWinTitle);
+      }
     });
   }
 
@@ -221,21 +229,27 @@ class MapSampleState extends State<MapSample> {
         await getBytesFromAsset('assets/images/IconChrg4.png', 120);
 
     String dataSnippet = 'nekas';
-    Services.getAllInfo(infWinTitle).then((value) {
+    loadingAplis(context);
+    await Services.getAllInfo(infWinTitle).then((value) {
       dataSnippet = value;
+      if (value == "error") {
+        Navigator.of(context).pop();
+        showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
+      } else {
+        Navigator.of(context).pop();
+        markers.add(Marker(
+          markerId: MarkerId(positionVar.toString()),
+          position: positionVar, //position of marker
 
-      markers.add(Marker(
-        markerId: MarkerId(positionVar.toString()),
-        position: positionVar, //position of marker
+          onTap: () {
+            setState(() {
+              popUpCharging(infWinTitle);
+            });
+          },
 
-        onTap: () {
-          setState(() {
-            popUpCharging(infWinTitle);
-          });
-        },
-
-        icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
-      ));
+          icon: BitmapDescriptor.fromBytes(markerIcon), //Icon for Marker
+        ));
+      }
     });
 
     setState(() {});
@@ -250,19 +264,25 @@ class MapSampleState extends State<MapSample> {
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
           backgroundColor: MaterialStateProperty.all<Color>(
               const Color.fromARGB(255, 166, 59, 185))),
-      onPressed: () {
+      onPressed: () async {
         if (trisViena == '000' || trisViena == '0') {
           // pārbaude uz ievadīto staciju
           showAlertDialog(context, 'enterCharger', '0', '0', '0', '0');
         } else {
           if (buttonIndex == 0) {
             // ja ir ievadīta stacija, tad ja poga ir sākt lādēt stāvoklī
-            Services.updateTimerStart(SharedPrefs().username);
+            //Services.updateTimerStart(SharedPrefs().username);
             buttonIndex = 1;
+            loadingAplis(context);
+            await Services.getUseSimple(trisViena).then((value) async {
+              if (value == "error") {
+                Navigator.of(context).pop();
+                showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
+              } else
 
-            Services.getUseSimple(trisViena).then((value) {
               // pārbaude vai stacija ir brīva
               if (value == '[{"in_use":"Pieejams"}]') {
+                Navigator.of(context).pop();
                 //buttonIndex = 1;
                 if (SharedPrefs().username.isEmpty ||
                     SharedPrefs().paymentCard.isEmpty) {
@@ -270,6 +290,7 @@ class MapSampleState extends State<MapSample> {
                   buttonName = 'Sākt uzlādi';
                   showAlertDialog(context, 'addCardMail', '0', '0', '0', '0');
                 } else {
+                  await Services.updateTimerStart(SharedPrefs().username);
                   resetFrom();
                   Services.updateUse(trisViena, 'Nepieejams');
                   SharedPrefs().charging = 'Y';
@@ -277,6 +298,7 @@ class MapSampleState extends State<MapSample> {
                   //buttonIndex = 1;
                 }
               } else {
+                Navigator.of(context).pop();
                 showAlertDialog(context, 'busyCharger', '0', '0', '0',
                     '0'); // paziņojums, ja ir aizņemta
 
@@ -291,8 +313,13 @@ class MapSampleState extends State<MapSample> {
           } else {
             // stāvoklis beigt uzlādi
             buttonIndex = 0;
-            Services.getUseSimple(trisViena).then((value) {
-              if (value == '[{"in_use":"Nepieejams"}]') {
+            loadingAplis(context);
+            await Services.getUseSimple(trisViena).then((value) {
+              if (value == "error") {
+                Navigator.of(context).pop();
+                showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
+              } else if (value == '[{"in_use":"Nepieejams"}]') {
+                Navigator.of(context).pop();
                 Services.updateUse(trisViena, 'Pieejams');
                 SharedPrefs().deleteCharging();
                 countTimeVar = countTime().toString();
@@ -315,6 +342,7 @@ class MapSampleState extends State<MapSample> {
                 station_code_n_3 = '0';
                 SharedPrefs().deleteChargingStation();
               } else {
+                Navigator.of(context).pop();
                 SharedPrefs().deleteCharging();
               }
             });
@@ -413,31 +441,36 @@ class MapSampleState extends State<MapSample> {
     Services.getTimer(SharedPrefs().username).then((value) {
       // funkcija laika iegūšanai no datubāzes
       // pēc lieottājvārda atrod datubāze LAIKS_START vērtību
-      int minNum;
-      int hourNum;
-      int secondNum;
-      String minString;
-      String hourString;
-      String secondString;
-      // Šeit sākas datetime datu tipa, kurš ir pārvērst par stringu pārvēršana par Duration datu tipu.
-
-      if (value.length == 22) {
-        minString = value.substring(14, 16);
-        hourString = value.substring(11, 13);
-        secondString = value.substring(17, 19);
+      if (value == "error") {
+        Navigator.of(context).pop();
+        showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
       } else {
-        minString = value.substring(15, 17);
-        hourString = value.substring(11, 14);
-        secondString = value.substring(18, 20);
-      }
+        int minNum;
+        int hourNum;
+        int secondNum;
+        String minString;
+        String hourString;
+        String secondString;
+        // Šeit sākas datetime datu tipa, kurš ir pārvērst par stringu pārvēršana par Duration datu tipu.
 
-      minNum = int.parse(minString); // šeit no string iegūtos pārvērš par int
-      hourNum = int.parse(hourString);
-      secondNum = int.parse(secondString);
-      // šeit varu likt
-      duration = Duration(
-          minutes: minNum,
-          seconds: secondNum); // šeit iegūtos int ievada kā manuālu laiku
+        if (value.length == 22) {
+          minString = value.substring(14, 16);
+          hourString = value.substring(11, 13);
+          secondString = value.substring(17, 19);
+        } else {
+          minString = value.substring(15, 17);
+          hourString = value.substring(11, 14);
+          secondString = value.substring(18, 20);
+        }
+
+        minNum = int.parse(minString); // šeit no string iegūtos pārvērš par int
+        hourNum = int.parse(hourString);
+        secondNum = int.parse(secondString);
+        // šeit varu likt
+        duration = Duration(
+            minutes: minNum,
+            seconds: secondNum); // šeit iegūtos int ievada kā manuālu laiku
+      }
     });
 
     int timeString = duration.inMinutes + 1;
@@ -461,30 +494,37 @@ class MapSampleState extends State<MapSample> {
 
   void resetFrom() async {
     // taimera uzlikšana uz laiku no datubāzes
+    loadingAplis(context);
     Services.getTimer(SharedPrefs().username).then((value) {
-      int minNum;
-      int hourNum;
-      int secondNum;
-      String minString;
-      String hourString;
-      String secondString;
-      if (value.length == 22) {
-        minString = value.substring(14, 16);
-        hourString = value.substring(11, 13);
-        secondString = value.substring(17, 19);
+      if (value == "error") {
+        Navigator.of(context).pop();
+        showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
       } else {
-        minString = value.substring(15, 17);
-        hourString = value.substring(11, 14);
-        secondString = value.substring(18, 20);
-      }
+        Navigator.of(context).pop();
+        int minNum;
+        int hourNum;
+        int secondNum;
+        String minString;
+        String hourString;
+        String secondString;
+        if (value.length == 22) {
+          minString = value.substring(14, 16);
+          hourString = value.substring(11, 13);
+          secondString = value.substring(17, 19);
+        } else {
+          minString = value.substring(15, 17);
+          hourString = value.substring(11, 14);
+          secondString = value.substring(18, 20);
+        }
 
-      minNum = int.parse(minString);
-      hourNum = int.parse(hourString);
-      secondNum = int.parse(secondString);
-      duration = Duration(minutes: minNum, seconds: secondNum);
-      setState(() {
-        duration;
-      });
+        minNum = int.parse(minString);
+        hourNum = int.parse(hourString);
+        secondNum = int.parse(secondString);
+        duration = Duration(minutes: minNum, seconds: secondNum);
+        setState(() {
+          duration;
+        });
+      }
     });
   }
 
@@ -499,29 +539,36 @@ class MapSampleState extends State<MapSample> {
       buttonIndex = 1;
       buttonName = 'Beigt uzlādi';
       trisViena = SharedPrefs().chargingStation;
-      Services.getTimer(SharedPrefs().username).then((value) {
-        int minNum;
-        int hourNum;
-        int secondNum;
-        String minString;
-        String hourString;
-        String secondString;
-
-        if (value.length == 22) {
-          minString = value.substring(14, 16);
-          hourString = value.substring(11, 13);
-          secondString = value.substring(17, 19);
+      loadingAplis(context);
+      await Services.getTimer(SharedPrefs().username).then((value) {
+        if (value == "error") {
+          Navigator.of(context).pop();
+          showAlertDialog(context, 'universalAlert', '0', '0', '0', '0');
         } else {
-          minString = value.substring(15, 17);
-          hourString = value.substring(11, 14);
-          secondString = value.substring(18, 20);
+          Navigator.of(context).pop();
+          int minNum;
+          int hourNum;
+          int secondNum;
+          String minString;
+          String hourString;
+          String secondString;
+
+          if (value.length == 22) {
+            minString = value.substring(14, 16);
+            hourString = value.substring(11, 13);
+            secondString = value.substring(17, 19);
+          } else {
+            minString = value.substring(15, 17);
+            hourString = value.substring(11, 14);
+            secondString = value.substring(18, 20);
+          }
+
+          minNum = int.parse(minString);
+          hourNum = int.parse(hourString);
+          secondNum = int.parse(secondString);
+
+          duration = Duration(minutes: minNum, seconds: secondNum);
         }
-
-        minNum = int.parse(minString);
-        hourNum = int.parse(hourString);
-        secondNum = int.parse(secondString);
-
-        duration = Duration(minutes: minNum, seconds: secondNum);
       });
       setState(() {});
     } else {

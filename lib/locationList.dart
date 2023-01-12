@@ -1,5 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// atrašanās vietu saraksts
+
 LatLng RigaLocation1 = const LatLng(56.9677, 24.1056);
 LatLng RigaLocation2 = const LatLng(56.961931, 24.117156);
 LatLng RigaLocation3 = const LatLng(56.960782, 24.123564);

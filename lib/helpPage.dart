@@ -49,7 +49,7 @@ class SecondPageHelp extends StatelessWidget {
                   children: [
                     const Icon(Icons.call,
                         size: 50, color: Color.fromARGB(255, 166, 59, 185)),
-                    phoneCallFunction(),
+                    phoneCallFunction(), // pārvirzīšana uz telefona lietoni funkcija
                   ],
                 ),
               ),
@@ -68,7 +68,7 @@ class SecondPageHelp extends StatelessWidget {
                   children: [
                     const Icon(Icons.mail_outlined,
                         size: 50, color: Color.fromARGB(255, 166, 59, 185)),
-                    emailSendingFunction(),
+                    emailSendingFunction(), // pārvirzīšana uz e-pasta lietoni funkcija
                   ],
                 ),
               ),
@@ -82,13 +82,14 @@ class SecondPageHelp extends StatelessWidget {
   ///// FUNKCIJAS /////
 
   phoneCallFunction() {
+    // pārvirzīšana uz telefona lietoni funkcijas implementācija
     return TextButton(
       child: const Text(
         '+371 26828334',
         style: TextStyle(fontSize: 25),
       ),
       onPressed: () async {
-        await launch("tel:+37126828334");
+        await launch("tel:+37126828334"); // telefona lietones izsaukšana
       },
     );
   }
@@ -104,7 +105,8 @@ class SecondPageHelp extends StatelessWidget {
         String subject = 'purel. Support';
 
         String? encodeQueryParameters(Map<String, String> params) {
-          return params.entries
+          // pieprasījuma funkcijas sagatavosāna, lai padotu parametrus uz e-pasta lietotni
+          return params.entries // piemēram tēmu, vai jau Tekstu e-pasta body
               .map((MapEntry<String, String> e) =>
                   '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
               .join('&');
@@ -114,10 +116,11 @@ class SecondPageHelp extends StatelessWidget {
           scheme: 'mailto',
           path: email,
           query: encodeQueryParameters(<String, String>{
+            // pieprasījuma funkcija
             'subject': subject,
           }),
         );
-        launchUrl(emailUri);
+        launchUrl(emailUri); // e-pasta lietotnes ipaŗvirzīšana
       },
     );
   }

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'globals.dart';
+
+// SQL servisu fails
 
 class Services {
-  static const ROOT = 'http://192.168.101.8/roberts.php';
+  static const ROOT =
+      'http://192.168.101.8/roberts.php'; // funkciju atpazīšanas mainīgie map veidam
   static const _GET_ALL_INFO_ACTION = 'GET_ALL_INFO';
   static const _GET_USE_ACTION = 'GET_USE';
   static const _GET_EMAIL_ACTION = 'GET_EMAIL';
@@ -17,33 +21,58 @@ class Services {
   // _GET_ALL
 
   static Future<String> getAllInfo(String id_no) async {
-    String data;
-    var map = Map<String, dynamic>();
-    map['action'] = _GET_ALL_INFO_ACTION;
-    map['id_no'] = id_no;
-    var response = await http.post(Uri.parse(ROOT), body: map);
-    data = response.body.toString();
-    return data;
+    try {
+      // pārbaude vai izdevās savienoties ar datubāzi
+      String data;
+      var map = Map<String, dynamic>();
+      map['action'] = _GET_ALL_INFO_ACTION;
+      map['id_no'] = id_no;
+      var response = await http.post(Uri.parse(ROOT), body: map);
+      data = response.body.toString();
+      if (200 == response.statusCode) {
+        return data;
+      } else {
+        return "error"; // ja nenotika savienojums, tad kods nav 200 un tiek tgriezs šis error
+      }
+    } catch (e) {
+      return "error";
+    }
   }
 
   static Future<String> getUseSimple(String id_no) async {
-    String data;
-    var map = Map<String, dynamic>();
-    map['action'] = _GET_USE_ACTION;
-    map['id_no'] = id_no;
-    var response = await http.post(Uri.parse(ROOT), body: map);
-    data = response.body.toString();
-    return data;
+    try {
+      String data;
+      var map = Map<String, dynamic>();
+      map['action'] = _GET_USE_ACTION;
+      map['id_no'] = id_no;
+      var response = await http.post(Uri.parse(ROOT), body: map);
+      data = response.body.toString();
+      if (200 == response.statusCode) {
+        return data;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error";
+    }
   }
 
   static Future<String> getTimer(String email) async {
-    String data;
-    var map = Map<String, dynamic>();
-    map['action'] = _GET_TIMER_ACTION;
-    map['email'] = email;
-    var response = await http.post(Uri.parse(ROOT), body: map);
-    data = response.body.toString();
-    return data;
+    try {
+      String data;
+      var map = Map<String, dynamic>();
+      map['action'] = _GET_TIMER_ACTION;
+      map['email'] = email;
+      var response = await http.post(Uri.parse(ROOT), body: map);
+      data = response.body.toString();
+      if (200 == response.statusCode) {
+        return data;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error";
+    }
   }
 
   static Future<String> updateTimerStart(String email) async {
@@ -63,13 +92,23 @@ class Services {
   }
 
   static Future<String> getEmail(String email) async {
-    String data;
-    var map = Map<String, dynamic>();
-    map['action'] = _GET_EMAIL_ACTION;
-    map['email'] = email;
-    var response = await http.post(Uri.parse(ROOT), body: map);
-    data = response.body.toString();
-    return data;
+    try {
+      String data;
+      var map = Map<String, dynamic>();
+      map['action'] = _GET_EMAIL_ACTION;
+      map['email'] = email;
+      var response = await http.post(Uri.parse(ROOT), body: map);
+      print('statusCOde:');
+      data = response.body.toString();
+      print(response.statusCode);
+      if (200 == response.statusCode) {
+        return data;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error";
+    }
   }
 
   static Future<String> addEmail(String email) async {
@@ -147,13 +186,21 @@ class Services {
   }
 
   static Future<String> calcPrice(String timeSpent, String id_no) async {
-    String data;
-    var map = Map<String, dynamic>();
-    map['action'] = _CALC_PRICE_ACTION;
-    map['timeSpent'] = timeSpent;
-    map['id_no'] = id_no;
-    var response = await http.post(Uri.parse(ROOT), body: map);
-    data = response.body.toString();
-    return data;
+    try {
+      String data;
+      var map = Map<String, dynamic>();
+      map['action'] = _CALC_PRICE_ACTION;
+      map['timeSpent'] = timeSpent;
+      map['id_no'] = id_no;
+      var response = await http.post(Uri.parse(ROOT), body: map);
+      data = response.body.toString();
+      if (200 == response.statusCode) {
+        return data;
+      } else {
+        return "error";
+      }
+    } catch (e) {
+      return "error";
+    }
   }
 }

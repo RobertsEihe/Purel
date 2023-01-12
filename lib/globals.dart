@@ -10,9 +10,20 @@ int currentIndex = 0;
 
 //////  GLOBĀLAS FUNKCIJAS  //////
 
+loadingAplis(context) {
+  return showDialog(
+      context: context,
+      builder: (context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      });
+}
+
 // SHARED PREFI
 
 class SharedPrefs {
+  // lokālo failu glabātuves funkcija, neglabā kešatmiņā, bet failos, tākā mini datubāze, kurā glabājas mainīgajos, nevar veikt insertus
   static SharedPreferences _sharedPrefs =
       SharedPreferences.getInstance() as SharedPreferences;
   factory SharedPrefs() => SharedPrefs._internal();
@@ -75,6 +86,7 @@ class SharedPrefs {
 }
 
 // ALERT DIALOG
+// paziņojumu dialogi
 
 showAlertDialog(BuildContext context, String alertCase, String chargeTime,
     String chargePrice, String stationInfo, String stationNumber) {
@@ -258,6 +270,7 @@ showAlertDialog(BuildContext context, String alertCase, String chargeTime,
 }
 
 Text displaySpentTimeAndMoney(String chargeTimeString, String chargePrice) {
+  // laika demonstrēšanai paziņojumu diologā
   int chargeTimeInt = int.parse(chargeTimeString);
 
   late num wholeHours;
@@ -275,6 +288,7 @@ Text displaySpentTimeAndMoney(String chargeTimeString, String chargePrice) {
 }
 
 class CustomInputFormatterSpace extends TextInputFormatter {
+  // ievades fomatora funkcijas implementācija priekš pauzes
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {
@@ -301,6 +315,7 @@ class CustomInputFormatterSpace extends TextInputFormatter {
 }
 
 class CustomInputFormatterSlash extends TextInputFormatter {
+  // ievades fomatora funkcijas implementācija priekš " / "
   @override
   TextEditingValue formatEditUpdate(
       TextEditingValue oldValue, TextEditingValue newValue) {

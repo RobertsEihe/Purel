@@ -35,6 +35,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   pageStartState(int buttonState) async {
+    // ekrāna sākuma stāvokļa funkcijas implementēšana
     if (SharedPrefs().paymentCard != '' &&
         SharedPrefs().paymentCard != ' ' &&
         SharedPrefs().paymentCard.isNotEmpty) {
@@ -51,6 +52,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ekrāna sākuma stāvokļa funkcijas pēc programams palaišanas
       pageStartState(buttonIndex);
     });
   }
@@ -83,15 +85,15 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
               buttonIndex == 0
                   ? Column(
                       children: [
-                        cardNumberInputFunction(),
-                        cardHolderInputFunction(),
+                        cardNumberInputFunction(), // ievades lauku funkciju izsaukumi
+                        cardHolderInputFunction(), // ievades lauku funkciju izsaukumi
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            cardMMYYinputFunction(),
+                            cardMMYYinputFunction(), // ievades lauku funkciju izsaukumi
                             const Padding(
                                 padding: EdgeInsets.only(left: (19.0))),
-                            cardCVCinputFunction(),
+                            cardCVCinputFunction(), // ievades lauku funkciju izsaukumi
                           ],
                         ),
                         const Padding(padding: EdgeInsets.all(8.0)),
@@ -108,7 +110,9 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '**** ' + SharedPrefs().paymentCard,
+                                '**** ' +
+                                    SharedPrefs()
+                                        .paymentCard, // maksājumu kartes inforācijas fragmenta attēlošana uz ekrāna
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.w500,
@@ -118,7 +122,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
                             ],
                           ),
                         ),
-                        deleteCardFunction(),
+                        deleteCardFunction(), // kartes izdzēšanas funkcijas izsaukums
                       ],
                     ),
               const Padding(padding: EdgeInsets.all(8.0)),
@@ -140,6 +144,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
               const Color.fromARGB(255, 166, 59, 185))),
       onPressed: () {
         if (buttonIndex == 0) {
+          // šie ir validāciajs reakcijas diologi, ja kkas nav labi
           if (cardNumber.isEmpty) {
             showAlertDialog(context, 'incorrectCardNum', '0', '0', '0',
                 '0'); // funkcija paziņojuma dialoga parādīšanai
@@ -175,6 +180,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   deleteCardFunction() {
+    // maksājumu kartes dzēšanas funkcijas implementācija
     return ElevatedButton(
       style: ButtonStyle(
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
@@ -194,6 +200,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   deleteCardFunctionAlert() {
+    // maksājumu kartes dzēšanas procesa funkcija
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -223,6 +230,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   cardNumberInputFunction() {
+    // kartes numura ievades funkcijas implementācija
     return SizedBox(
       height: 50,
       width: 240,
@@ -263,6 +271,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   cardHolderInputFunction() {
+    // kartes turētāja vārda ievades funkcijas implementācija
     return SizedBox(
       height: 50,
       width: 240,
@@ -295,6 +304,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   cardMMYYinputFunction() {
+    // kartes derģuma termiņa ievades funkcijas implementācija
     return SizedBox(
       height: 50,
       width: 110,
@@ -336,6 +346,7 @@ class _SecondPageTwoState extends State<SecondPageTwo> {
   }
 
   cardCVCinputFunction() {
+    // kartes CVC ievades funkcijas implementācija
     return SizedBox(
       height: 50,
       width: 110,
