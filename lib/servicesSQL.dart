@@ -6,7 +6,7 @@ import 'globals.dart';
 
 class Services {
   static const ROOT =
-      'http://192.168.101.8/roberts.php'; // funkciju atpazīšanas mainīgie map veidam
+      'http://192.168.101.8/mySqlScript.php'; // funkciju atpazīšanas mainīgie map veidam
   static const _GET_ALL_INFO_ACTION = 'GET_ALL_INFO';
   static const _GET_USE_ACTION = 'GET_USE';
   static const _GET_EMAIL_ACTION = 'GET_EMAIL';
