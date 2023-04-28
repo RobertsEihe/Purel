@@ -1,6 +1,6 @@
 # Purel
 
-Electric vehicle charging station network app.
+Electric vehicle charging station network app in Flutter.
 
 ## To launch the app
 
